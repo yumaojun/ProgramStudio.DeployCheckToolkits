@@ -1,0 +1,29 @@
+﻿@using ProgramStudio.DeployCheckToolkits.Web.Startup
+@{
+    ViewBag.CurrentPageName = PageNames.Settings;
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    Settings
+                </h2>
+            </div>
+            <div class="body">
+                <span>项目</span>
+                <input type="text" />
+                <br />
+                <span>类型</span>
+                <input type="text" />
+                <br />
+                <span>配置</span>
+                <textarea></textarea>
+                <br />
+                <button>确定</button>
+                <button onclick="history.go(-1);">取消</button>
+            </div>
+        </div>
+    </div>
+</div>

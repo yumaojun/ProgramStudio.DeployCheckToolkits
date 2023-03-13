@@ -7,13 +7,12 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Castle.Facilities.Logging;
 using Abp.AspNetCore;
+using Abp.AspNetCore.SignalR.Hubs;
 using Abp.Castle.Logging.Log4Net;
 using ProgramStudio.DeployCheckToolkits.Authentication.JwtBearer;
 using ProgramStudio.DeployCheckToolkits.Configuration;
 using ProgramStudio.DeployCheckToolkits.Identity;
 using ProgramStudio.DeployCheckToolkits.Web.Resources;
-using Abp.AspNetCore.SignalR.Hubs;
-
 
 namespace ProgramStudio.DeployCheckToolkits.Web.Startup
 {
@@ -30,7 +29,8 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Startup
         {
             // MVC
             services.AddMvc(
-                options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute())
+                //options => options.Filters.Add(new AutoValidateAntiforgeryTokenAttribute())
+                options => options.Filters.Add(new IgnoreAntiforgeryTokenAttribute())
             );
 
             IdentityRegistrar.Register(services);
@@ -81,7 +81,7 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Startup
 
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "{controller=DeployCheck}/{action=Index}/{id?}");
             });
         }
     }

@@ -1,0 +1,181 @@
+﻿@using ProgramStudio.DeployCheckToolkits.Web.Startup
+@{ ViewBag.CurrentPageName = PageNames.DeployCheck; }
+
+@section styles{ 
+    <link href="~/lib/webuploader-0.1.5/webuploader.css" rel="stylesheet" asp-append-version="true" />
+}
+@section scripts{
+    <script src="~/lib/webuploader-0.1.5/webuploader.nolog.min.js" asp-append-version="true"></script>
+    <script>
+        var oldFile = null;
+        var uploader = WebUploader.create({
+            swf: abp.appPath + 'lib/webuploader-0.1.5/Uploader.swf',
+            server: '/DeployCheck/Uploader',
+            pick: { id: '#picker', multiple: false },
+            fileNumLimit: 1,
+            duplicate: true,
+            resize: false
+        });
+        uploader.on('beforeFileQueued', function (file) {
+            if (oldFile) {
+                $("#thelist").children("#" + oldFile.id).remove();
+                uploader.removeFile(oldFile);
+            }
+        });
+        uploader.on('fileQueued', function (file) {
+            let $list = $("#thelist");
+            $list.append('<div id="' + file.id + '" class="item">' +
+                '<h4 class="info">' + file.name + '</h4>' +
+                '<p class="state">等待上传...</p>' +
+                '</div>');
+            oldFile = file;
+        });
+        uploader.on('uploadProgress', function (file, percentage) {
+            let $li = $('#' + file.id),
+                $percent = $li.find('.progress .progress-bar');
+            if (!$percent.length) {
+                $percent = $('<div class="progress progress-striped active">' +
+                    '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                    '</div>' +
+                    '</div>').appendTo($li).find('.progress-bar');
+            }
+            $li.find('p.state').text('上传中');
+            $percent.css('width', percentage * 100 + '%');
+        });
+        uploader.on('uploadComplete', function (file) {
+            let $li = $('#' + file.id);
+            $('#' + file.id).find('.progress').fadeOut();
+            $li.find('p.state').text('上传完成');
+        });
+        uploader.on('uploadSuccess', function (file, response) {
+        });
+        uploader.on('uploadError', function (file, reason) {
+        });
+        uploader.on('uploadFinished', function (file) {
+             
+        });
+        $("#ctlBtn").on("click", function () {
+            uploader.upload();
+        });
+    </script>
+}
+
+<div class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    @L("DeployCheck")
+                </h2>
+            </div>
+            <div class="body">
+                <div class="container" style="width: auto !important;">
+                    <!--<div class="row">-->
+                        @*<label for="projectinput" class="col-lg-1 col-md-1 col-sm-1 col-form-label">项目名称</label>*@
+                        <!--<div class="col-lg-2 col-md-2 col-sm-2 dropdown">
+                            <button nextinputid="categoryinput" id="projectinput" class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>
+                                请选择项目类别
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="projectinput">
+                                <a class="dropdown-item" href="#" v-for="temp in projects">{{temp.name}}</a>
+                            </div>
+                        </div>-->
+                        @*<label for="categoryinput" class="col-lg-1 col-md-1 col-sm-1 col-form-label">部署环境</label>*@
+                        <!--<div class="col-lg-2 col-md-2 col-sm-2 dropdown">
+                            <button nextinputid="" id="categoryinput" class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>
+                                请选择部署环境
+                            </button>
+                            <div class="dropdown-menu" aria-labelledby="categoryinput">
+                                <a class="dropdown-item" href="#" v-for="temp in categories">{{temp.name}}</a>
+                            </div>
+                        </div>
+                    </div>-->
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="btn-group" role="group" aria-label="...">
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        请选择项目类别
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">Dropdown link</a></li>
+                                        <li><a href="#">Dropdown link</a></li>
+                                    </ul>
+                                </div>
+                                <div class="btn-group" role="group">
+                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        请选择部署环境
+                                        <span class="caret"></span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li><a href="#">Dropdown link</a></li>
+                                        <li><a href="#">Dropdown link</a></li>
+                                    </ul>
+                                </div>
+                                <button id="picker" class="btn btn-default">请选择一个文件</button>
+                                <button id="ctlBtn" class="btn btn-primary">
+                                <span class="glyphicon glyphicon-ok"></span>开始检查</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div id="thelist" class="uploader-list"></div>
+                        </div>
+                    </div>
+                    @*<div class="row">
+                        <div class="col-lg-12 col-md-12 col-sm-12">
+                            <div class="btn-group">
+                                <button id="picker" class="btn btn-default">请选择一个文件</button>
+                                <button id="ctlBtn" class="btn btn-primary">开始上传并检查</button>
+                            </div>
+                        </div>
+                    </div>*@
+                </div>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>文件</th>
+                            <th>结果</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @*<tr>
+                            <td>tenant.TenancyName1</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName2</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName3</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name.Nametenant.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName4</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName5</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant..Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
+                        </tr>
+                        <tr>
+                            <td>tenant.TenancyName</td>
+                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
+                        </tr>*@
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
