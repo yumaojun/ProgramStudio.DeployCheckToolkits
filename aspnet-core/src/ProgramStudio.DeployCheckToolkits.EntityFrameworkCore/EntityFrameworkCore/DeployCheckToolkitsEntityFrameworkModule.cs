@@ -32,6 +32,8 @@ namespace ProgramStudio.DeployCheckToolkits.EntityFrameworkCore
                     }
                 });
             }
+            // SQLite: disable transactions
+            Configuration.UnitOfWork.IsTransactional = false;
         }
 
         public override void Initialize()

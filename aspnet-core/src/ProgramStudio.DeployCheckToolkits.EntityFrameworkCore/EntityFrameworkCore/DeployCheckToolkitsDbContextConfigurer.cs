@@ -7,12 +7,12 @@ namespace ProgramStudio.DeployCheckToolkits.EntityFrameworkCore
     {
         public static void Configure(DbContextOptionsBuilder<DeployCheckToolkitsDbContext> builder, string connectionString)
         {
-            builder.UseSqlServer(connectionString);
+            builder.UseSqlite(connectionString);
         }
 
         public static void Configure(DbContextOptionsBuilder<DeployCheckToolkitsDbContext> builder, DbConnection connection)
         {
-            builder.UseSqlServer(connection);
+            builder.UseSqlite(connection);
         }
     }
 }
