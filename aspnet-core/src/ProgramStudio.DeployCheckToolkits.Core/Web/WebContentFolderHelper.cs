@@ -30,13 +30,13 @@ namespace ProgramStudio.DeployCheckToolkits.Web
                 directoryInfo = directoryInfo.Parent;
             }
 
-            var webMvcFolder = Path.Combine(directoryInfo.FullName, "src", "ProgramStudio.DeployCheckToolkits.Web.Mvc");
+            var webMvcFolder = Path.Combine(directoryInfo.FullName,/* "src",*/ "ProgramStudio.DeployCheckToolkits.Web.Mvc");
             if (Directory.Exists(webMvcFolder))
             {
                 return webMvcFolder;
             }
 
-            var webHostFolder = Path.Combine(directoryInfo.FullName, "src", "ProgramStudio.DeployCheckToolkits.Web.Host");
+            var webHostFolder = Path.Combine(directoryInfo.FullName,/* "src",*/ "ProgramStudio.DeployCheckToolkits.Web.Host");
             if (Directory.Exists(webHostFolder))
             {
                 return webHostFolder;

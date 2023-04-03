@@ -25,6 +25,7 @@
             abp.ajax({
                 url: abp.appPath + 'Tenants/EditTenantModal?tenantId=' + tenantId,
                 type: 'POST',
+                dataType: 'html',
                 contentType: 'application/html',
                 success: function (content) {
                     $('#TenantEditModal div.modal-content').html(content);

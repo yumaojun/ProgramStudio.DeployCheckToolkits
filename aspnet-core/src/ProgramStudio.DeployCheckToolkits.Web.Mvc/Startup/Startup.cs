@@ -77,7 +77,7 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Startup
             {
                 routes.MapRoute(
                     name: "defaultWithArea",
-                    template: "{area}/{controller=Home}/{action=Index}/{id?}");
+                    template: "{area}/{controller=DeployCheck}/{action=Index}/{id?}");
 
                 routes.MapRoute(
                     name: "default",

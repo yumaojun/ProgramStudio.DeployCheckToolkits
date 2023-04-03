@@ -1,37 +1,49 @@
 # Important
 
-Issues of this repository are tracked on https://github.com/aspnetboilerplate/aspnetboilerplate. Please create your issues on https://github.com/aspnetboilerplate/aspnetboilerplate/issues.
+开发环境：Visual Studio 2019 + .NET Frameworks 4.8
 
 # Introduction
 
-This is a template to create **ASP.NET Core MVC / Angular** based startup projects for [ASP.NET Boilerplate](https://aspnetboilerplate.com/Pages/Documents). It has 2 different versions:
+部署：IIS (.NET Frameworks 4.8) + 安装ASP.NET Core 运行时 2.2.8（建议安装托管捆绑包[Hosting Bundle](https://dotnet.microsoft.com/zh-cn/download/dotnet/thank-you/runtime-aspnetcore-3.1.32-windows-hosting-bundle-installer)）
 
-1. [ASP.NET Core MVC & jQuery](https://aspnetboilerplate.com/Pages/Documents/Zero/Startup-Template-Core) (server rendered multi-page application).
-2. [ASP.NET Core & Angular](https://aspnetboilerplate.com/Pages/Documents/Zero/Startup-Template-Angular) (single page application).
- 
-User Interface is based on [BSB Admin theme](https://github.com/gurayyarar/AdminBSBMaterialDesign).
- 
-# Download
+增加文件ProgramStudio.DeployCheckToolkits.Web.Mvc.runtimeconfig.json
 
-Create & download your project from https://aspnetboilerplate.com/Templates
+{
+ "runtimeOptions": {
+    "framework": {
+      "name": "Microsoft.AspNetCore.App",
+      "version": "2.2.8"
+    }
+ }
+}
+
+ApplcationPool配置权限
+
+web.config
+
+设置节点aspNetCore的processPath=".\ProgramStudio.DeployCheckToolkits.Web.Mvc.exe"
+<aspNetCore processPath=".\ProgramStudio.DeployCheckToolkits.Web.Mvc.exe" arguments="" stdoutLogEnabled="false" stdoutLogFile=".\logs\stdout" forwardWindowsAuthToken="false">
+
+
+# Other
+
+无
 
 # Screenshots
 
-#### Sample Dashboard Page
-![](_screenshots/module-zero-core-template-ui-home.png)
+#### 部署包检查
+![](_screenshots/web-check.png)
 
-#### User Creation Modal
-![](_screenshots/module-zero-core-template-ui-user-create-modal.png)
+#### Cutover Plan检查
+![](_screenshots/web-cutoverplan-check.png)
 
 #### Login Page
 
-![](_screenshots/module-zero-core-template-ui-login.png)
+![](_screenshots/web-login.png)
 
 # Documentation
 
-* [ASP.NET Core MVC & jQuery version.](https://aspnetboilerplate.com/Pages/Documents/Zero/Startup-Template-Core)
-* [ASP.NET Core & Angular  version.](https://aspnetboilerplate.com/Pages/Documents/Zero/Startup-Template-Angular)
+无
 
 # License
 
-[MIT](LICENSE).

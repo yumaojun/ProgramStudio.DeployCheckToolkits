@@ -72,7 +72,8 @@
     
     <text name="Yes">是</text>
     <text name="No">否</text>
-    
+
+	<text name="Save">保存</text>
     <text name="Cancel">取消</text>
     <text name="OK">确定</text>
     <text name="CreateNewRole">创建新角色</text>
@@ -98,7 +99,35 @@
     <text name="EditTenant">编辑租户</text>
 
 	<text name="Settings">配置</text>
+	<text name="CreateNewSetting">创建新配置</text>
+	<text name="EditSetting">编辑配置</text>
 	<text name="DeployCheck">检查</text>
+	<text name="ProjectName">项目名称</text>
+	<text name="DeployName">部署环境</text>
+	<text name="XmlContent">Xml内容</text>
+	<text name="CheckResults">检查结果</text>
+	<text name="SelectOneFile">请选择上传一个文件</text>
+	<text name="UploadFile">上传文件</text>
+	<text name="StartCheck">开始检查</text>
+	<text name="SelectProjectName">请选择项目名称</text>
+	<text name="SelectDeployName">请选择部署环境</text>
+	<text name="Matches">个匹配</text>
+	<text name="PleaseCheckConfiguration">请检查配置文件</text>
+	<text name="WaitingForUpload">等待上传</text>
+	<text name="Uploading">上传中</text>
+	<text name="UploadCompleted">上传完成</text>
+	<text name="ViewHistory">查看历史</text>
+	<text name="ReturnCheck">返回检查</text>
+	<text name="SelectFileError">选择的文件格式不允许</text>
+	<text name="None">无</text>
+	<text name="SearchResultTips">：搜索于${duration}内完成 - 找到${matchCount}个匹配项，它们位于${successCount}个文件内，共搜索了${processedFiles}个文件</text>
+	<text name="FileName">文件名称</text>
+	<text name="FileExtension">文件类型</text>
+
+	<text name="CutoverPlan">Cutover Plan检查</text>
+	<text name="Refresh">刷新</text>
+	<text name="Project">项目</text>
+	<text name="ProjectInfo">项目信息</text>
   </texts>
 </localizationDictionary>
 

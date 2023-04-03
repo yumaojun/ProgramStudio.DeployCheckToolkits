@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ArrayOfWebSearchCriteria xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <WebSearchCriteria>
+    <Operation>Search</Operation>
+    <UseFileSizeFilter>No</UseFileSizeFilter>
+    <SizeFrom>0</SizeFrom>
+    <SizeTo>100</SizeTo>
+    <UseFileDateFilter>None</UseFileDateFilter>
+    <TypeOfTimeRangeFilter>None</TypeOfTimeRangeFilter>
+    <StartDate xsi:nil="true" />
+    <EndDate xsi:nil="true" />
+    <HoursFrom>0</HoursFrom>
+    <HoursTo>8</HoursTo>
+    <TypeOfFileSearch>Asterisk</TypeOfFileSearch>
+    <FilePattern>*.*</FilePattern>
+    <UseGitIgnore>true</UseGitIgnore>
+    <IncludeArchive>true</IncludeArchive>
+    <IncludeBinary>false</IncludeBinary>
+    <IncludeHidden>true</IncludeHidden>
+    <IncludeSubfolder>true</IncludeSubfolder>
+    <MaxSubfolderDepth>-1</MaxSubfolderDepth>
+    <FollowSymlinks>false</FollowSymlinks>
+    <CodePage>-1</CodePage>
+    <TypeOfSearch>PlainText</TypeOfSearch>
+    <SearchFor>qa</SearchFor>
+  </WebSearchCriteria>
+</ArrayOfWebSearchCriteria>

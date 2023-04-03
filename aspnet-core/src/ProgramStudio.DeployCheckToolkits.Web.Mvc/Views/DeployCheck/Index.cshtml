@@ -1,121 +1,424 @@
 ﻿@using ProgramStudio.DeployCheckToolkits.Web.Startup
-@{ ViewBag.CurrentPageName = PageNames.DeployCheck; }
-
-@section styles{ 
+@{
+    ViewBag.CurrentPageName = PageNames.DeployCheck;
+}
+@section styles{
     <link href="~/lib/webuploader-0.1.5/webuploader.css" rel="stylesheet" asp-append-version="true" />
+    <style>
+        ::highlight(search-results) {
+            background-color: yellow;
+            color: black;
+        }
+    </style>
 }
 @section scripts{
     <script src="~/lib/webuploader-0.1.5/webuploader.nolog.min.js" asp-append-version="true"></script>
-    <script>
+    <script src="~/js/axios.min.js" asp-append-version="true"></script>
+    <script src="~/js/vue.js" asp-append-version="true"></script>
+    <script type="text/javascript">
+        var allowedFileExtensions = 'txt,xml,apk,ipa,zip,7z,jar,war,ear,rar,cab,gz,gzip,tar,rpm,iso,isx,bz2,bzip2,tbz2,tbz,tgz,arj,cpio,deb,dmg,hfs,hfsx,lzh,lha,lzma,z,taz,xar,pkg,xz,txz,zipx,epub,wim,chm';
+        var msgTips = '';
+        var msgProjectName = '';
+        var msgDeployName = '';
+        var msgSelectOneFile = '';
+        var msgUploadFile = '';
+        var msgCheckConfiguration = '';
+        var msgWaitingForUpload = '';
+        var msgUploading = '';
+        var msgUploadCompleted = '';
+        var msgSelectFileError = '';
+        var msgNone = '';
+        var msgSearchResultTips = '';
+        function initMsg() {
+            msgTips = $("#hdTips").val();
+            msgProjectName = $("#hdSelectProjectName").val();
+            msgDeployName = $("#hdSelectDeployName").val();
+            msgSelectOneFile = $("#hdSelectOneFile").val();
+            msgUploadFile = $("#hdUploadFile").val();
+            msgCheckConfiguration = $("#hdCheckConfiguration").val();
+            msgWaitingForUpload = $("#hdWaitingForUpload").val();
+            msgUploading = $("#hdUploading").val();
+            msgUploadCompleted = $("#hdUploadCompleted").val();
+            msgSelectFileError = $("#hdSelectFileError").val();
+            msgNone = $("#hdNone").val();
+            msgSearchResultTips = $("#hdSearchResultTips").val();
+        }
+        function viewHistory() {
+            window.location.href = abp.appPath + "DeployCheck/History";
+        }
+        var serverFileName = "";
+        var serverFileMd5Cache = [];
+        var serverFileMd5 = "";
         var oldFile = null;
-        var uploader = WebUploader.create({
-            swf: abp.appPath + 'lib/webuploader-0.1.5/Uploader.swf',
-            server: '/DeployCheck/Uploader',
-            pick: { id: '#picker', multiple: false },
-            fileNumLimit: 1,
-            duplicate: true,
-            resize: false
-        });
-        uploader.on('beforeFileQueued', function (file) {
-            if (oldFile) {
-                $("#thelist").children("#" + oldFile.id).remove();
-                uploader.removeFile(oldFile);
-            }
-        });
-        uploader.on('fileQueued', function (file) {
+        var uploader = null;
+        function addFileQueueText(file, message) {
             let $list = $("#thelist");
             $list.append('<div id="' + file.id + '" class="item">' +
                 '<h4 class="info">' + file.name + '</h4>' +
-                '<p class="state">等待上传...</p>' +
+                '<p class="state">' + message + '...</p>' +
                 '</div>');
             oldFile = file;
-        });
-        uploader.on('uploadProgress', function (file, percentage) {
-            let $li = $('#' + file.id),
-                $percent = $li.find('.progress .progress-bar');
-            if (!$percent.length) {
-                $percent = $('<div class="progress progress-striped active">' +
-                    '<div class="progress-bar" role="progressbar" style="width: 0%">' +
-                    '</div>' +
-                    '</div>').appendTo($li).find('.progress-bar');
+        }
+        function createUploader(callback) {
+            uploader = WebUploader.create({
+                swf: abp.appPath + 'lib/webuploader-0.1.5/Uploader.swf',
+                server: '/DeployCheck/Uploader',
+                pick: { id: '#picker', multiple: false },
+                fileNumLimit: 1,
+                duplicate: true,
+                resize: false,
+                auto: true,
+                fileSingleSizeLimit: 100 * 1024 * 1024/*MB*/
+            });
+            uploader.on('beforeFileQueued', function (file) {
+                if ($.inArray(file.ext.toLowerCase(), allowedFileExtensions.split(",")) == -1) {
+                    abp.message.warn(msgSelectFileError, msgTips);
+                    return false;
+                }
+                //let thisFileMd5 = "";
+                //uploader.md5File(file)
+                //    .progress(function (percentage) {
+                //        console.log('Percentage:', percentage);
+                //    })
+                //    .then(function (md5) {
+                //        thisFileMd5 = md5;
+                //    });
+                //if ($.inArray(thisFileMd5, serverFileMd5Cache) != -1) {
+                //    addFileQueueText(file, msgUploadCompleted);
+                //    serverFileMd5 = thisFileMd5;
+                //    return false;
+                //}
+                //uploader.options = {
+                //    formData: {
+                //        fileMd5: thisFileMd5
+                //    }
+                //};
+                if (oldFile) {
+                    $("#thelist").children("#" + oldFile.id).remove();
+                    uploader.removeFile(oldFile);
+                    serverFileName = "";
+                    //serverFileMd5 = "";
+                    oldFile = null;
+                }
+            });
+            uploader.on('fileQueued', function (file) {
+                let $list = $("#thelist");
+                $list.append('<div id="' + file.id + '" class="item">' +
+                    '<h4 class="info">' + file.name + '</h4>' +
+                    '<p class="state">' + msgWaitingForUpload + '...</p>' +
+                    '</div>');
+                oldFile = file;
+                //uploader.md5File(file)
+                //    .progress(function (percentage) {
+                //        console.log('Percentage:', percentage);
+                //    })
+                //    .then(function (val) {
+                //        serverFileMd5 = val;
+                //        console.log('md5 result:', val);
+                //    });
+            });
+            uploader.on('uploadProgress', function (file, percentage) {
+                let $li = $('#' + file.id),
+                    $percent = $li.find('.progress .progress-bar');
+                if (!$percent.length) {
+                    $percent = $('<div class="progress progress-striped active">' +
+                        '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+                        '</div>' +
+                        '</div>').appendTo($li).find('.progress-bar');
+                }
+                $li.find('p.state').text(msgUploading);
+                $percent.css('width', percentage * 100 + '%');
+            });
+            uploader.on('uploadComplete', function (file) {
+                let $li = $('#' + file.id);
+                $('#' + file.id).find('.progress').fadeOut();
+                $li.find('p.state').text(msgUploadCompleted);
+            });
+            uploader.on('uploadSuccess', function (file, response) {
+                //debugger
+                //serverFileMd5Cache.push(serverFileMd5);
+                serverFileName = response.result;
+                //console.log("uploadSuccess", response);
+                callback();
+            });
+            uploader.on('uploadAccept', function (object, response) {
+                //console.log("uploadAccept", object, response);
+                //debugger
+            });
+            uploader.on('uploadError', function (file, reason) {
+                //abp.message.warn("上传出错！请检查后重新上传！", msgTips);
+                //console.log("uploadError", reason);
+                //debugger
+            });
+            uploader.on("error", function (type) {
+                //if (type == "F_EXCEED_SIZE") {
+                //    abp.message.warn("文件大小不能超过100MB", msgTips);
+                //} else {
+                //abp.message.warn("上传出错！请检查后重新上传！错误代码" + type, msgTips);
+                //}
+                //console.log("error", type);
+            });
+            uploader.on('uploadFinished', function () {
+                ///*没有文件上传也会运行到此*/
+                //if (oldFile != null && serverFileName != "") {
+                //    callback();
+                //} else {
+                //    abp.message.warn(msgSelectOneFile, msgTips);
+                //}
+                //console.log("uploadFinished");
+            });
+        }
+        var app = new Vue({
+            el: '#app',
+            data: {
+                projectName: msgProjectName,
+                deployName: msgDeployName,
+                projectNames: [],
+                deployNamesCache: [],
+                deployNames: [],
+                dataResult: [],
+                xmlContent: "",
+                fileName: "",
+                duration: "",
+                matchCount: 0,
+                successCount: 0,
+                processedFiles: 0,
+                searchResultTipsCache: "",
+                searchResultTips: ""
+            },
+            watch: {
+            },
+            computed: {
+            },
+            updated: function () {
+                //updated
+                //const parentNode = document.getElementById("resultRows");
+                //const treeWalker = document.createTreeWalker(parentNode, NodeFilter.SHOW_TEXT);
+                //const allTextNodes = [];
+                //let currentNode = treeWalker.nextNode();
+                //while (currentNode) {
+                //    allTextNodes.push(currentNode);
+                //    currentNode = treeWalker.nextNode();
+                //}
+                //const str = "qa";
+                //allTextNodes.map((el) => {
+                //        return { el, text: el.textContent.toLowerCase() };
+                //    })
+                //    .map(({ text, el }) => {
+                //        const indices = [];
+                //        let startPos = 0;
+                //        while (startPos < text.length) {
+                //            const index = text.indexOf(str, startPos);
+                //            if (index === -1) break;
+                //            indices.push(index);
+                //            startPos = index + str.length;
+                //        }
+                //        return indices.map((index) => {
+                //            const range = new Range();
+                //            range.setStart(el, index);
+                //            range.setEnd(el, index + str.length);
+                //            return range;
+                //        });
+                //    });
+                //const searchResultsHighlight = new Highlight(...ranges.flat());
+                //CSS.highlights.set("search-results", searchResultsHighlight);
+                ////const range1 = new Range();
+                //range1.setStart(parentNode, 5);
+                //range1.setEnd(parentNode, 10);
+                //const user1Highlight = new Highlight(user1Range1);
+                //CSS.highlights.set("user-1-highlight", user1Highlight);
+            },
+            mounted() {
+                initMsg();
+                this.projectName = msgProjectName;
+                this.deployName = msgDeployName;
+                this.searchResultTipsCache = msgSearchResultTips;
+                axios.get(`${abp.appPath}DeployCheck/Configuration`)
+                    .then(response => {
+                        let result = response.data.result;
+                        try {
+                            this.projectNames = [msgProjectName].concat(result.projectNames);
+                            this.deployNamesCache = result.grepConfigurations;
+                            this.deployNames = [{ deployName: msgDeployName }].concat(result.grepConfigurations);
+                        } catch (e) {
+                            console.log(e, response);
+                        }
+                    });
+                createUploader(this.clearResult);
+                let thisCheckDataOk = this.checkDataOk;
+                let thisSubmitData = this.submitData;
+                $("#ctlBtn").on("click", function () {
+                    if (thisCheckDataOk()) {
+                        if (oldFile != null && serverFileName != "") {
+                            thisSubmitData();
+                        } else {
+                            abp.message.warn(msgSelectOneFile, msgTips);
+                        }
+                    }
+                });
+                $('#ViewHistory').click(function () {
+                    viewHistory();
+                });
+            },
+            methods: {
+                clearResult() {
+                    this.dataResult = [];
+                    this.searchResultTips = "";
+                },
+                submitData() {
+                    let formData = new FormData();
+                    formData.append("projectName", this.projectName);
+                    formData.append("deployName", this.deployName);
+                    formData.append("xmlContent", this.xmlContent);
+                    formData.append("fileName", serverFileName);
+                    let contentHeader = {
+                        headers: { 'content-type': 'application/x-www-form-urlencoded' }
+                    }
+                    this.dataResult = [];
+                    abp.ui.setBusy("#app");
+                    axios.post(`${abp.appPath}DeployCheck/Grep`, formData, contentHeader)
+                        .then(response => {
+                            try {
+                                let result = response.data.result;
+                                this.duration = result.duration;
+                                if (result.dataResult != null && result.dataResult.length > 0) {
+                                    this.dataResult = result.dataResult;
+                                    this.matchCount = result.matchCount;
+                                    this.successCount = result.successCount;
+                                    this.processedFiles = result.processedFiles;
+                                } else {
+                                    this.dataResult = [{ innerFileName: msgNone, matches: [], searchResults: [] }];
+                                    this.matchCount = 0;
+                                    this.successCount = 0;
+                                    this.processedFiles = 0;
+                                }
+                                this.searchResultTips = this.searchResultTipsCache.replace("${duration}", this.duration).replace("${matchCount}", this.matchCount)
+                                    .replace("${successCount}", this.successCount).replace("${processedFiles}", this.processedFiles);
+                            } catch (e) {
+                                console.log(e, response);
+                            }
+                        }).catch(function (error) {
+                            try {
+                                if (error.response && error.response.data) {
+                                    abp.message.warn(error.response.data.result, msgTips);
+                                }
+                            } catch (e) {
+                                console.log(e);
+                            }
+                        }).finally(function () {
+                            abp.ui.clearBusy('#app');
+                        });
+                },
+                checkDataOk() {
+                    if (this.projectName == msgProjectName) {
+                        abp.message.warn(msgProjectName, msgTips);
+                        return false;
+                    }
+                    if (this.deployName == msgDeployName) {
+                        abp.message.warn(msgDeployName, msgTips);
+                        return false;
+                    }
+                    if (this.xmlContent == "") {
+                        abp.message.warn(msgCheckConfiguration, msgTips);
+                        return false;
+                    }
+                    return true;
+                },
+                selectProject(e) {
+                    this.projectName = e.target.innerText;
+                    let thisProjectName = this.projectName;
+                    let thisDeployNames = this.deployNamesCache.filter(function (item) {
+                        return item["projectName"] == thisProjectName;
+                    });
+                    this.deployNames = [{ deployName: msgDeployName }].concat(thisDeployNames);
+                    this.deployName = msgDeployName;
+                },
+                selectDeploy(e) {
+                    this.deployName = e.target.innerText;
+                    let thisProjectName = this.projectName;
+                    let thisDeployName = this.deployName;
+                    let thisDeployNames = this.deployNamesCache.filter(function (item) {
+                        return item["projectName"] == thisProjectName && item["deployName"] == thisDeployName;
+                    });
+                    if (thisDeployNames.length > 0) {
+                        this.xmlContent = thisDeployNames[0]["xmlContent"];
+                    }
+                },
+                toggleSearchResults(e) {
+                    let $spanButton = $(e.target);
+                    let $divSearchResult = $spanButton.siblings("div.searchResults");
+                    if ($spanButton.hasClass("glyphicon-triangle-right")) {
+                        $spanButton.removeClass("glyphicon-triangle-right").addClass("glyphicon-triangle-bottom");
+                        $divSearchResult.css("display", "block");
+                    } else {
+                        $spanButton.removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-right");
+                        $divSearchResult.css("display", "none");
+                    }
+                }
             }
-            $li.find('p.state').text('上传中');
-            $percent.css('width', percentage * 100 + '%');
-        });
-        uploader.on('uploadComplete', function (file) {
-            let $li = $('#' + file.id);
-            $('#' + file.id).find('.progress').fadeOut();
-            $li.find('p.state').text('上传完成');
-        });
-        uploader.on('uploadSuccess', function (file, response) {
-        });
-        uploader.on('uploadError', function (file, reason) {
-        });
-        uploader.on('uploadFinished', function (file) {
-             
-        });
-        $("#ctlBtn").on("click", function () {
-            uploader.upload();
         });
     </script>
 }
-
-<div class="row clearfix">
+<div id="app" class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
             <div class="header">
                 <h2>
                     @L("DeployCheck")
+                    <input id="hdTips" type="hidden" value="@L("Tips")" />
+                    <input id="hdSelectProjectName" type="hidden" value="@L("SelectProjectName")" />
+                    <input id="hdSelectDeployName" type="hidden" value="@L("SelectDeployName")" />
+                    <input id="hdSelectOneFile" type="hidden" value="@L("SelectOneFile")" />
+                    <input id="hdCheckConfiguration" type="hidden" value="@L("CheckConfiguration")" />
+                    <input id="hdWaitingForUpload" type="hidden" value="@L("WaitingForUpload")" />
+                    <input id="hdUploading" type="hidden" value="@L("Uploading")" />
+                    <input id="hdUploadCompleted" type="hidden" value="@L("UploadCompleted")" />
+                    <input id="hdSelectFileError" type="hidden" value="@L("SelectFileError")" />
+                    <input id="hdNone" type="hidden" value="@L("None")" />
+                    <input id="hdSearchResultTips" type="hidden" value="@L("SearchResultTips")" />
                 </h2>
+                <ul class="header-dropdown m-r--5">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="material-icons">more_vert</i>
+                        </a>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a id="ViewHistory" href="javascript:void(0);" class="waves-effect waves-block"><i class="material-icons">history</i>@L("ViewHistory")</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
             <div class="body">
                 <div class="container" style="width: auto !important;">
-                    <!--<div class="row">-->
-                        @*<label for="projectinput" class="col-lg-1 col-md-1 col-sm-1 col-form-label">项目名称</label>*@
-                        <!--<div class="col-lg-2 col-md-2 col-sm-2 dropdown">
-                            <button nextinputid="categoryinput" id="projectinput" class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>
-                                请选择项目类别
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="projectinput">
-                                <a class="dropdown-item" href="#" v-for="temp in projects">{{temp.name}}</a>
-                            </div>
-                        </div>-->
-                        @*<label for="categoryinput" class="col-lg-1 col-md-1 col-sm-1 col-form-label">部署环境</label>*@
-                        <!--<div class="col-lg-2 col-md-2 col-sm-2 dropdown">
-                            <button nextinputid="" id="categoryinput" class="btn btn-outline-primary dropdown-toggle" type="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false" required>
-                                请选择部署环境
-                            </button>
-                            <div class="dropdown-menu" aria-labelledby="categoryinput">
-                                <a class="dropdown-item" href="#" v-for="temp in categories">{{temp.name}}</a>
-                            </div>
-                        </div>
-                    </div>-->
                     <div class="row">
                         <div class="col-lg-12 col-md-12 col-sm-12">
                             <div class="btn-group" role="group" aria-label="...">
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        请选择项目类别
+                                    <button type="button" class="btn btn-default dropdown-toggle" style="min-width: 150px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{this.projectName}}
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#">Dropdown link</a></li>
-                                        <li><a href="#">Dropdown link</a></li>
+                                        <li v-for="currentTemp in projectNames"><a href="#" @@click="selectProject">{{currentTemp}}</a></li>
                                     </ul>
                                 </div>
                                 <div class="btn-group" role="group">
-                                    <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                        请选择部署环境
+                                    <button type="button" class="btn btn-default dropdown-toggle" style="min-width: 150px;" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                        {{this.deployName}}
                                         <span class="caret"></span>
                                     </button>
                                     <ul class="dropdown-menu">
-                                        <li><a href="#">Dropdown link</a></li>
-                                        <li><a href="#">Dropdown link</a></li>
+                                        <li v-for="currentTemp in deployNames"><a href="#" @@click="selectDeploy">{{currentTemp.deployName}}</a></li>
                                     </ul>
                                 </div>
-                                <button id="picker" class="btn btn-default">请选择一个文件</button>
-                                <button id="ctlBtn" class="btn btn-primary">
-                                <span class="glyphicon glyphicon-ok"></span>开始检查</button>
+                                <button id="picker" class="btn btn-default" style="min-width: 150px;">
+                                    <span class="glyphicon glyphicon-th-list"></span>
+                                    @L("UploadFile")
+                                </button>
+                                <button id="ctlBtn" class="btn btn-primary" style="min-width: 150px;">
+                                    <span class="glyphicon glyphicon-ok"></span>
+                                    @L("StartCheck")
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -124,55 +427,30 @@
                             <div id="thelist" class="uploader-list"></div>
                         </div>
                     </div>
-                    @*<div class="row">
-                        <div class="col-lg-12 col-md-12 col-sm-12">
-                            <div class="btn-group">
-                                <button id="picker" class="btn btn-default">请选择一个文件</button>
-                                <button id="ctlBtn" class="btn btn-primary">开始上传并检查</button>
-                            </div>
-                        </div>
-                    </div>*@
                 </div>
-                <table class="table">
+                <table id="table" class="table">
                     <thead>
                         <tr>
-                            <th>文件</th>
-                            <th>结果</th>
+                            <th>@L("CheckResults")<span style="font-weight: normal;">{{searchResultTips}}</span></th>
                         </tr>
                     </thead>
-                    <tbody>
-                        @*<tr>
-                            <td>tenant.TenancyName1</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
+                    <tbody id="resultRows">
+                        <tr v-for="dataTemp in dataResult">
+                            <td>
+                                <span class="glyphicon glyphicon-triangle-right" @@click="toggleSearchResults"></span>
+                                {{dataTemp.innerFileName}}(<span style="color: red;">{{dataTemp.matches.length}}</span>@L("Matches"))
+                                <div class="searchResults" style="display: none; line-height: 16px;">
+                                    <p class="searchTexts" style="margin: 0;" v-for="innerTemp in dataTemp.searchResults">
+                                        @*<div class="searchMatches" v-for="matcheTemp in innerTemp.matches">
+                                                {{matcheTemp.startLocation}}
+                                                {{matcheTemp.endPosition}}
+                                            </div>*@
+                                        <span style="background-color: lightgray; padding: 0 3px 0 3px;">{{innerTemp.lineNumber}}</span>
+                                        {{innerTemp.lineText}}
+                                    </p>
+                                </div>
+                            </td>
                         </tr>
-                        <tr>
-                            <td>tenant.TenancyName2</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName3</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name.Nametenant.Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName4</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，.Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName5</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant..Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
-                        </tr>
-                        <tr>
-                            <td>tenant.TenancyName</td>
-                            <td>tenant.Name，tenant.Nametenant.Nametenant..Name，tenant.Nametenant.Nametenant.Nametenant.Name。</td>
-                        </tr>*@
                     </tbody>
                 </table>
             </div>

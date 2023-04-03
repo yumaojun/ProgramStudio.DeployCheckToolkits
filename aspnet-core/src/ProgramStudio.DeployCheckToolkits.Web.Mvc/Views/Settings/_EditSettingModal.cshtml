@@ -1,0 +1,41 @@
+﻿@using ProgramStudio.DeployCheckToolkits.DeployCheck.Dto
+@using ProgramStudio.DeployCheckToolkits.Web.Models.Common.Modals
+@model GrepConfigurationDto
+@{
+    Layout = null;
+}
+@await Html.PartialAsync("~/Views/Shared/Modals/_ModalHeader.cshtml", new ModalHeaderViewModel(L("EditSetting")))
+
+<div class="modal-body">
+    <form name="SettingEditForm" role="form" novalidate class="form-validation">
+        <input type="hidden" name="Id" value="@Model.Id" />
+        <div class="form-group form-float">
+            <div class="form-line">
+                <input class="form-control" type="text" name="ProjectName" value="@Model.ProjectName" required maxlength="100" minlength="2">
+                <label class="form-label">@L("ProjectName")</label>
+            </div>
+        </div>
+        <div class="form-group form-float">
+            <div class="form-line">
+                <input class="form-control" type="text" name="DeployName" value="@Model.DeployName" required maxlength="100">
+                <label class="form-label">@L("DeployName")</label>
+            </div>
+        </div>
+        <div class="form-group form-float">
+            <div class="form-line">
+                <textarea class="form-control" name="XmlContent" style="height: 160px;" required maxlength="2000">@Model.XmlContent</textarea>
+                <label class="form-label">@L("XmlContent")</label>
+            </div>
+        </div>
+        <div class="form-group form-float">
+            <div class="">
+                <input id="isactive" type="checkbox" name="IsActive" value="true" @(Model.IsActive ? "checked" : "") class="form-control" />
+                <label for="isactive" class="form-label">@L("IsActive")</label>
+            </div>
+        </div>
+    </form>
+</div>
+
+@await Html.PartialAsync("~/Views/Shared/Modals/_ModalFooterWithSaveAndCancel.cshtml")
+
+<script src="~/view-resources/Views/GrepConfiguration/_EditSettingModal.js" asp-append-version="true"></script>

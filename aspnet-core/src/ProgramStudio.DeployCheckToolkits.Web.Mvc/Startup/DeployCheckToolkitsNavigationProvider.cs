@@ -30,6 +30,14 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Startup
                     )
                 ).AddItem(
                     new MenuItemDefinition(
+                        PageNames.CutoverPlan,
+                        L("CutoverPlan"),
+                        url: "CutoverPlan",
+                        icon: "apps",
+                        requiresAuthentication: true
+                    )
+                ).AddItem(
+                    new MenuItemDefinition(
                         PageNames.Tenants,
                         L("Tenants"),
                         url: "Tenants",

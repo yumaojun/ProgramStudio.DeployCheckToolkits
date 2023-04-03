@@ -26,6 +26,7 @@
 			abp.ajax({
 				url: abp.appPath + 'Roles/EditRoleModal?roleId=' + roleId,
 				type: 'POST',
+				dataType: 'html',
 				contentType: 'application/html',
 				success: function (content) {
 					$('#RoleEditModal div.modal-content').html(content);

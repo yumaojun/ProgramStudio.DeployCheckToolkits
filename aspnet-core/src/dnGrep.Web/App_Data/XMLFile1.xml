@@ -1,0 +1,29 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<ArrayOfWebSearchCriteria xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+	<WebSearchCriteria>
+		<Operation value="GrepOperation.Search"></Operation>
+		<UseFileSizeFilter value="FileSizeFilter.No"></UseFileSizeFilter>
+		<SizeFrom>0</SizeFrom>
+		<SizeTo>100</SizeTo>
+		<UseFileDateFilter value="FileDateFilter.All"></UseFileDateFilter>
+		<TypeOfTimeRangeFilter value="FileTimeRange.All"></TypeOfTimeRangeFilter>
+		<StartDate value="null"></StartDate>
+		<EndDate value="null"></EndDate>
+		<HoursFrom value="0"></HoursFrom>
+		<HoursTo value="8"></HoursTo>
+		<TypeOfFileSearch value="FileSearchType.Asterisk"></TypeOfFileSearch>
+		<FilePattern value="*.*"></FilePattern>
+		<FilePatternIgnore value="null"></FilePatternIgnore>
+		<UseGitIgnore value="true"></UseGitIgnore>
+		<IncludeArchive value="true"></IncludeArchive>
+		<IncludeBinary value="false"></IncludeBinary>
+		<IncludeHidden value="true"></IncludeHidden>
+		<IncludeSubfolder value="true"></IncludeSubfolder>
+		<MaxSubfolderDepth value="-1"></MaxSubfolderDepth>
+		<FollowSymlinks value="false"></FollowSymlinks>
+		<CodePage value="-1"></CodePage>
+		<TypeOfSearch value="SearchType.PlainText"></TypeOfSearch>
+		<SearchFor value="barcode"></SearchFor>
+		<ReplaceWith value="null"></ReplaceWith>
+	</WebSearchCriteria>
+</ArrayOfWebSearchCriteria>

@@ -1,0 +1,124 @@
+<Project>
+  <Import Project="Sdk.props" Sdk="WixToolset.Sdk" Version="4.0.0-rc.1" />
+  <PropertyGroup>
+    <WIX Condition=" '$(WIX)' == '' ">C:\Program Files (x86)\WiX Toolset v3.8\</WIX>
+    <SourcePath Condition=" '$(SourcePath)' == '' ">.</SourcePath>
+    <OutputName>dnGREP.X.X.X.X.$(Platform)</OutputName>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x86' ">
+    <DefineConstants>Debug;SourcePath=$(SourcePath)</DefineConstants>
+    <WixVariables>SourcePathApp=$(SourcePath)\Release\$(Platform)\dnGREP X.X.X (Standalone);SourcePathPdf=$(SourcePath)\Release\$(Platform)\dnGREP PDF Plugin X.X.X\Plugins;SourcePathWord=$(SourcePath)\Release\$(Platform)\dnGREP MsWord Plugin X.X.X\Plugins;SourcePathArchive=$(SourcePath)\Release\$(Platform)\dnGREP Archive Plugin X.X.X\Plugins</WixVariables>
+    <OutputPath>..\Release\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
+    <DefineConstants>Debug;SourcePath=$(SourcePath)</DefineConstants>
+    <WixVariables>SourcePathApp=$(SourcePath)\Release\$(Platform)\dnGREP X.X.X (Standalone);SourcePathPdf=$(SourcePath)\Release\$(Platform)\dnGREP PDF Plugin X.X.X\Plugins;SourcePathWord=$(SourcePath)\Release\$(Platform)\dnGREP MsWord Plugin X.X.X\Plugins;SourcePathArchive=$(SourcePath)\Release\$(Platform)\dnGREP Archive Plugin X.X.X\Plugins</WixVariables>
+    <OutputPath>..\Release\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|x64' ">
+    <DefineConstants>Debug;SourcePath=$(SourcePath)</DefineConstants>
+    <WixVariables>SourcePathApp=$(SourcePath)\Release\$(Platform)\dnGREP X.X.X (Standalone);SourcePathPdf=$(SourcePath)\Release\$(Platform)\dnGREP PDF Plugin X.X.X\Plugins;SourcePathWord=$(SourcePath)\Release\$(Platform)\dnGREP MsWord Plugin X.X.X\Plugins;SourcePathArchive=$(SourcePath)\Release\$(Platform)\dnGREP Archive Plugin X.X.X\Plugins</WixVariables>
+    <OutputPath>..\Release\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x64' ">
+    <DefineConstants>Debug;SourcePath=$(SourcePath)</DefineConstants>
+    <WixVariables>SourcePathApp=$(SourcePath)\Release\$(Platform)\dnGREP X.X.X (Standalone);SourcePathPdf=$(SourcePath)\Release\$(Platform)\dnGREP PDF Plugin X.X.X\Plugins;SourcePathWord=$(SourcePath)\Release\$(Platform)\dnGREP MsWord Plugin X.X.X\Plugins;SourcePathArchive=$(SourcePath)\Release\$(Platform)\dnGREP Archive Plugin X.X.X\Plugins</WixVariables>
+    <OutputPath>..\Release\$(Platform)\</OutputPath>
+    <IntermediateOutputPath>obj\$(Platform)\$(Configuration)\</IntermediateOutputPath>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="Conditions.wxi" />
+    <Content Include="Variables.wxi" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Fragments\" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WixToolset.UI.wixext" Version="4.0.0-rc.1" />
+    <PackageReference Include="WixToolset.NetFx.wixext" Version="4.0.0-rc.1" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\dnGREP.Common.UI\dnGREP.Common.UI.csproj">
+      <Name>dnGREP.Common.UI</Name>
+      <Project>{da182974-5fd2-4dfb-938d-dcdc2d232547}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.Common\dnGREP.Common.csproj">
+      <Name>dnGREP.Common</Name>
+      <Project>{32df5b77-ee00-4a94-bf4c-19bcbb1940a4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.DockFloat\dnGREP.DockFloat.csproj">
+      <Name>dnGREP.DockFloat</Name>
+      <Project>{86C22DB6-4211-44A1-93BA-B21027CC90F9}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.Engines\dnGREP.Engines.csproj">
+      <Name>dnGREP.Engines</Name>
+      <Project>{db68b5d3-5e4b-47d0-aa86-83d7c181a1e4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.Everything\dnGREP.Everything.csproj">
+      <Name>dnGREP.Everything</Name>
+      <Project>{39c7bce4-7837-401e-8afa-2bcfe70c63f7}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.OpenXmlEngine\dnGREP.OpenXmlEngine.csproj">
+      <Name>dnGREP.OpenXmlEngine</Name>
+      <Project>{8312cae2-b208-4186-b711-815593febb94}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.PdfEngine\dnGREP.PdfEngine.csproj">
+      <Name>dnGREP.PdfEngine</Name>
+      <Project>{6b5159a5-c92c-4203-84de-273feb30d07b}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.WordEngine\dnGREP.WordEngine.csproj">
+      <Name>dnGREP.WordEngine</Name>
+      <Project>{fa9512ef-562c-4dc1-9cf2-7a8ff896d352}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+    <ProjectReference Include="..\dnGREP.WPF\dnGREP.WPF.csproj">
+      <Name>dnGREP.WPF</Name>
+      <Project>{cbc7aec0-59ff-4050-b02d-adb15359ced4}</Project>
+      <Private>True</Private>
+      <DoNotHarvest>True</DoNotHarvest>
+      <RefProjectOutputGroups>Binaries;Content;Satellites</RefProjectOutputGroups>
+      <RefTargetDir>INSTALLFOLDER</RefTargetDir>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="Sdk.targets" Sdk="WixToolset.Sdk" Version="4.0.0-rc.1" />
+  <PropertyGroup>
+    <PreBuildEvent>powershell -executionpolicy bypass -file "$(ProjectDir)PreBuild_dnGrepSetup.ps1" "$(SolutionDir)AssemblyVersionCommon.cs" "$(ProjectDir)Variables.wxi"</PreBuildEvent>
+  </PropertyGroup>
+  <PropertyGroup>
+    <PostBuildEvent>powershell -executionpolicy bypass -file "$(ProjectDir)PostBuild_dnGrepSetup.ps1" "$(SolutionDir)AssemblyVersionCommon.cs" "!(TargetPath)" "!(TargetPdbPath)"</PostBuildEvent>
+  </PropertyGroup>
+</Project>

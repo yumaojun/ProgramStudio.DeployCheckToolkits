@@ -1008,6 +1008,88 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.ToTable("AbpUsers");
                 });
 
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlanInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("DeployItemName");
+
+                    b.Property<string>("DeployVersion");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("RollbackVersion");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CutoverPlanInfos");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.DeployCheck.GrepConfiguration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("DeployName");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("XmlContent");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GrepConfigurations");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.DeployCheck.GrepHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("DeployName");
+
+                    b.Property<string>("FileExtension");
+
+                    b.Property<string>("FileName");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("Result");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GrepHistories");
+                });
+
             modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.MultiTenancy.Tenant", b =>
                 {
                     b.Property<int>("Id")
@@ -1055,6 +1137,28 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.HasIndex("TenancyName");
 
                     b.ToTable("AbpTenants");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.ProjectInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProjectInfos");
                 });
 
             modelBuilder.Entity("Abp.Application.Features.EditionFeatureSetting", b =>

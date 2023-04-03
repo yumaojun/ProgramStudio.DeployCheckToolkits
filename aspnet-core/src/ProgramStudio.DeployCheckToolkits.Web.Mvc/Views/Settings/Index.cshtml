@@ -1,8 +1,19 @@
 ﻿@using ProgramStudio.DeployCheckToolkits.Web.Startup
+@using ProgramStudio.DeployCheckToolkits.DeployCheck
+@model Abp.Application.Services.Dto.PagedResultDto<ProgramStudio.DeployCheckToolkits.DeployCheck.Dto.GrepConfigurationDto>
 @{
     ViewBag.CurrentPageName = PageNames.Settings;
 }
+@section scripts
+{
+    <environment names="Development">
+        <script src="~/view-resources/Views/GrepConfiguration/Index.js" asp-append-version="true"></script>
+    </environment>
 
+    <environment names="Staging,Production">
+        <script src="~/view-resources/Views/GrepConfiguration/Index.js" asp-append-version="true"></script>
+    </environment>
+}
 <div class="row clearfix">
     <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
         <div class="card">
@@ -10,37 +21,100 @@
                 <h2>
                     @L("Settings")
                 </h2>
+                <ul class="header-dropdown m-r--5">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="material-icons">more_vert</i>
+                        </a>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a id="RefreshButton" href="javascript:void(0);" class="waves-effect waves-block"><i class="material-icons">refresh</i>@L("Refresh")</a></li>
+                        </ul>
+                    </li>
+                </ul>
             </div>
             <div class="body table-responsive">
                 <table class="table">
                     <thead>
                         <tr>
-                            <th>项目名称</th>
-                            <th>部署环境</th>
+                            <th>@L("ProjectName")</th>
+                            <th>@L("DeployName")</th>
                             <th>@L("IsActive")</th>
                         </tr>
                     </thead>
                     <tbody>
+                        @foreach (var grepConfiguration in Model.Items)
+                        {
                         <tr>
-                            <td>tenant.TenancyName</td>
-                            <td>tenant.Name</td>
-                            <td><i class="material-icons" style="color:@(true ? "green":"red");">@(true ? "check_box" : "indeterminate_check_box")</i></td>
+                            <td>@grepConfiguration.ProjectName</td>
+                            <td>@grepConfiguration.DeployName</td>
+                            <td><i class="material-icons" style="color:@(@grepConfiguration.IsActive ? "green" : "red");">@(true ? "check_box" : "indeterminate_check_box")</i></td>
                             <td class="dropdown">
                                 <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
                                     <i class="material-icons">menu</i>
                                 </a>
                                 <ul class="dropdown-menu pull-right">
-                                    <li><a href="#" class="waves-effect waves-block edit-tenant" data-tenant-id="Id" data-toggle="modal" data-target="#TenantEditModal"><i class="material-icons">edit</i>@L("Edit")</a></li>
-                                    <li><a href="#" class="waves-effect waves-block delete-tenant" data-tenant-id="Id" data-tenancy-name="tenant.TenancyName"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
+                                    <li><a href="#" class="waves-effect waves-block edit-setting" data-setting-id="@grepConfiguration.Id" data-toggle="modal" data-target="#SettingEditModal"><i class="material-icons">edit</i>@L("Edit")</a></li>
+                                    <li><a href="#" class="waves-effect waves-block delete-setting" data-setting-id="@grepConfiguration.Id" data-setting-name="@grepConfiguration.ProjectName"><i class="material-icons">delete_sweep</i>@L("Delete")</a></li>
                                 </ul>
                             </td>
                         </tr>
+                        }
                     </tbody>
                 </table>
-                <button type="button" class="btn btn-primary btn-circle waves-effect waves-circle waves-float pull-right" data-toggle="modal" data-target="#TenantCreateModal">
+                <button type="button" class="btn btn-primary btn-circle waves-effect waves-circle waves-float pull-right" data-toggle="modal" data-target="#SettingCreateModal">
                     <i class="material-icons">add</i>
                 </button>
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SettingCreateModal" tabindex="-1" role="dialog" aria-labelledby="SettingCreateModalLabel" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form name="settingCreateForm" role="form" novalidate class="form-validation">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span>@L("CreateNewSetting")</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control" type="text" name="ProjectName" required maxlength="@GrepConfiguration.MaxProjectNameLength" minlength="2">
+                            <label class="form-label">@L("ProjectName")</label>
+                        </div>
+                    </div>
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <input class="form-control" type="text" name="DeployName" required maxlength="@GrepConfiguration.MaxDeployNameLength">
+                            <label class="form-label">@L("DeployName")</label>
+                        </div>
+                    </div>
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <textarea class="form-control" name="XmlContent" style="height: 160px;" required maxlength="@GrepConfiguration.MaxXmlContentLength"></textarea>
+                            <label class="form-label">@L("XmlContent")</label>
+                        </div>
+                    </div>
+                    <div class="checkbox">
+                        <input type="checkbox" name="IsActive" value="true" id="CreateSettingIsActive" class="filled-in" checked />
+                        <label for="CreateSettingIsActive">@L("IsActive")</label>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">@L("Cancel")</button>
+                    <button type="submit" class="btn btn-primary waves-effect">@L("Save")</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="SettingEditModal" tabindex="-1" role="dialog" aria-labelledby="SettingEditModalLabel" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+
         </div>
     </div>
 </div>

@@ -47,6 +47,7 @@
     <text name="Users" value="Users" />
     <text name="IsActive" value="Is active" />
     <text name="FullName" value="Full name" />
+	<text name="CreationTime">Creation Time</text>
     <text name="CreateNewUser" value="Create new user" />
     <text name="Yes" value="Yes" />
     <text name="No" value="No" />
@@ -95,6 +96,33 @@
     <text name="Skins">Skins</text>
     <text name="Settings">Settings</text>
     <text name="Filter">Filter</text>
+	<text name="CreateNewSetting">Create New Setting</text>
+	<text name="EditSetting">Edit Setting</text>
 	<text name="DeployCheck">Check</text>
+	<text name="ProjectName">Project Name</text>
+	<text name="DeployName">Deploy Name</text>
+	<text name="XmlContent">Xml Content</text>
+	<text name="CheckResults">Check Results</text>
+	<text name="SelectOneFile">Please select a file to upload</text>
+	<text name="UploadFile">Upload File</text>
+	<text name="StartCheck">Start Check</text>
+	<text name="SelectProjectName">Please select the project name</text>
+	<text name="SelectDeployName">Please select the deploy name</text>
+	<text name="Matches">Matches</text>
+	<text name="PleaseCheckConfiguration">Please check the configuration file</text>
+	<text name="WaitingForUpload">Waiting for upload</text>
+	<text name="Uploading">Uploading</text>
+	<text name="UploadCompleted">Upload completed</text>
+	<text name="ViewHistory">View History</text>
+	<text name="ReturnCheck">Return to Check</text>
+	<text name="SelectFileError">The selected file format is not allowed</text>
+	<text name="None">None</text>
+	<text name="SearchResultTips">: Search completed in ${duration} - ${matchCount} matches found in ${successCount} files of ${processedFiles} searched.</text>
+	<text name="FileName">File Name</text>
+	<text name="FileExtension">File Extension</text>
+	  
+	<text name="CutoverPlan">Cutover Plan Check</text>
+	<text name="Project">Project</text>
+	<text name="ProjectInfo">Project Info</text>
   </texts>
 </localizationDictionary>

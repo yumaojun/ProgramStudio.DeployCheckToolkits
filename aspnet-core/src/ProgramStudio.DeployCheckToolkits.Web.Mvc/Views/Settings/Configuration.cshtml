@@ -1,0 +1,101 @@
+﻿@using ProgramStudio.DeployCheckToolkits.Web.Startup
+
+@*@model List<ProgramStudio.DeployCheckToolkits.Web.WebUploadFileInfo>*@
+
+@{
+    ViewBag.CurrentPageName = PageNames.Settings;
+}
+@section styles{
+    @*<link href="~/css/page.css" rel="stylesheet" asp-append-version="true" />*@
+}
+@section scripts{
+    <script type="text/javascript">
+        function returnDeployCheck() {
+            window.location.href = abp.appPath + "DeployCheck";
+        }
+        $(document).ready(function () {
+            $('#ReturnCheck').click(function () {
+                returnDeployCheck();
+            });
+        })
+    </script>
+}
+<div id="app" class="row clearfix">
+    <div class="col-lg-12 col-md-12 col-sm-12 col-xs-12">
+        <div class="card">
+            <div class="header">
+                <h2>
+                    @L("EditSetting")
+                </h2>
+                <ul class="header-dropdown m-r--5">
+                    <li class="dropdown">
+                        <a href="javascript:void(0);" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="material-icons">more_vert</i>
+                        </a>
+                        <ul class="dropdown-menu pull-right">
+                            <li><a id="ReturnCheck" href="javascript:void(0);" class="waves-effect waves-block"><i class="material-icons">refresh</i>@L("ReturnCheck")</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+            <div class="body">
+                <div class="container" style="width: auto !important;">
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            <div class="form-line">
+                                <label class="form-label">在指定位置搜索</label>
+                                <input class="form-control" type="text" name="DeployName" value="" maxlength="100">
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            匹配文件名<input class="form-control" type="text" />
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            <div class="form-line">
+                                <label class="form-label">
+                                    在压缩文件中搜索
+                                </label>
+                                <input class="form-control" type="checkbox" />
+                            </div>
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            排除文件名<input class="form-control" type="text" />
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+                            <label>正则<input class="form-control" type="radio" /></label>
+                            <label>星号<input class="form-control" type="radio" /></label>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                        <div class="col-lg-1 col-md-1 col-sm-1 col-xs-1">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

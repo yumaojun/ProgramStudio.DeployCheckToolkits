@@ -1,0 +1,87 @@
+﻿@using dnGREP.Common;
+@{
+    ViewBag.Title = "Home Page";
+}
+@model List<GrepSearchResult>
+
+@*<div class="jumbotron">
+        <h1>ASP.NET</h1>
+        <p class="lead">ASP.NET is a free web framework for building great Web sites and Web applications using HTML, CSS and JavaScript.</p>
+        <p><a href="https://asp.net" class="btn btn-primary btn-lg">Learn more &raquo;</a></p>
+    </div>*@
+<div class="row">
+    <div class="col-md-12">
+        <form action="" method="post" enctype="multipart/form-data">
+            项目：<select><option>请选择</option></select>
+            部署环境：<select><option>请选择</option></select>
+            <input type="file" id="dnGrepFile" name="dnGrepFile" />
+            <input type="submit" value="Submit" />
+        </form>
+    </div>
+</div>
+<div class="row">
+    <div class="col-md-12" style="height: 400px; overflow: auto">
+        <table border="1" style="border: solid 1px; border-collapse: collapse;">
+            <tr>
+                <th>FileNameDisplayed:</th>
+                @*<th>FileNameReal:</th>*@
+                @*<th>FileType: </th>
+                    <th>FileSize:</th>*@
+                <th>SearchResults:</th>
+            </tr>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td style="vertical-align: top">
+                        <span onclick="showDiv()">
+                            @item.FileNameDisplayed
+                        </span>
+                    </td>
+                    @*<td>
+                            @item.FileNameReal
+                        </td>*@
+                    @*<td>
+                            @item.FileType
+                        </td>*@
+                    @*<td>
+                            @item.FileSize
+                        </td>*@
+                    <td>
+                        <div style="display: none">
+                            @foreach (var r in item.SearchResults)
+                            {
+                                if (@r.Matches.Count > 0)
+                                {
+                                    @Html.Raw(string.Format("{0}#{1}", r.LineNumber, r.LineText.Replace("qa", "<span style='color:red'>qa</span>")));
+                                }
+                                else
+                                {
+                                    @Html.Raw(string.Format("{0}#{1}", r.LineNumber, r.LineText));
+                                }
+                                <br />
+                            }
+                        </div>
+                    </td>
+                </tr>
+            }
+        </table>
+    </div>
+</div>
+<script>
+    function showDiv() {
+        let that = event.srcElement || event.target;
+        let next = that.parentNode.nextSibling;
+        while (next.nodeName == "#text") {
+            next = next.nextSibling;
+        }
+        let child = null;
+        let childs = next.childNodes;
+        for (let i = 0; i < childs.length; ++i) {
+            child = childs[i];
+            if (child.nodeName != "#text") {
+                break;
+            }
+        }
+        child.style.display = child.style.display == 'block' ? 'none' : 'block';
+    }
+</script>
