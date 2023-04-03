@@ -2,7 +2,6 @@
 using Abp.Domain.Entities.Auditing;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -10,18 +9,16 @@ using System.Threading.Tasks;
 namespace ProgramStudio.DeployCheckToolkits.CutoverPlan
 {
     /// <summary>
-    /// 项目名称，部署内容，部署版本号，回滚版本号
+    /// 项目名称，文件，检查结果
     /// </summary>
-    public class CutoverPlanInfo : AuditedEntity<int>
+    public class CutoverPlanHead : AuditedEntity<int>
     {
         public const int MaxProjectNameLength = 100;
+        public const int MaxFileNameLength = 300;
 
-        public CutoverPlanInfo():base()
+        public CutoverPlanHead() : base()
         {
         }
-
-        [Required]
-        public virtual CutoverPlanHead CutoverPlanHead { get; set; }
 
         /// <summary>
         /// 项目名称
@@ -29,18 +26,18 @@ namespace ProgramStudio.DeployCheckToolkits.CutoverPlan
         public virtual string ProjectName { get; set; }
 
         /// <summary>
-        /// 部署内容
+        /// 文件
         /// </summary>
-        public virtual string DeployItemName { get; set; }
+        public virtual string FileName { get; set; }
 
         /// <summary>
-        /// 部署版本号
+        /// 检查结果
         /// </summary>
-        public virtual string DeployVersion { get; set; }
+        public virtual string Result { get; set; }
 
         /// <summary>
-        /// 回滚版本号
+        /// 检查项
         /// </summary>
-        public virtual string RollbackVersion { get; set; }
+        public virtual List<CutoverPlanInfo> CutoverPlanInfos { get; set; }
     }
 }

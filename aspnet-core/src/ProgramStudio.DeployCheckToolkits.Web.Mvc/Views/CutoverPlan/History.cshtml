@@ -15,7 +15,14 @@
         function returnDeployCheck() {
             window.location.href = abp.appPath + "CutoverPlan";
         }
+        function viewCheckResults(that) {
+            var _$modal = $('#ViewCheckResultsModal').modal();
+            var text = $(that).parent().children("input").val();
+            text = text.replace(/;/g, "<br/>");
+            $("#contentCheckResults").html(text);
+        }
         $(document).ready(function () {
+
             $('#ReturnCheck').click(function () {
                 returnDeployCheck();
             });
@@ -45,43 +52,72 @@
                     <thead>
                         <tr>
                             <th>@L("ProjectName")</th>
+                            <th>@L("FileName")</th>
                             <th>@L("DeployItemName")</th>
                             <th>@L("DeployVersion")</th>
                             <th>@L("RollbackVersion")</th>
                             <th>@L("CreationTime")</th>
-                            @*<th>@L("Result")</th>*@
+                            <th>@L("CheckResults")</th>
                         </tr>
                     </thead>
                     <tbody>
                         @foreach (var item in Model)
-                            {
-                                <tr>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.ProjectName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.DeployItemName)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.DeployVersion)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.RollbackVersion)
-                                    </td>
-                                    <td>
-                                        @Html.DisplayFor(modelItem => item.CreationTime)
-                                    </td>
-                                    @*<td>
-                                        @Html.DisplayFor(modelItem => item.Result)
-                                    </td>*@
-                                </tr>
-                            }
+                        {
+                            <tr>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.ProjectName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CutoverPlanHead.FileName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DeployItemName)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.DeployVersion)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.RollbackVersion)
+                                </td>
+                                <td>
+                                    @Html.DisplayFor(modelItem => item.CreationTime)
+                                </td>
+                                <td>
+                                    @Html.Raw($"<a href='javascript:;' onclick='viewCheckResults(this)'>{@L("View")}</a>")
+                                    @Html.HiddenFor(modelItem => item.CutoverPlanHead.Result)
+                                </td>
+                            </tr>
+                        }
                     </tbody>
                 </table>
                 @*<h3>Minimal Paging Control @Model.PageNumber / Page Count @Model.PageCount / PageSize @Model.PageSize / TotalItemCount @Model.TotalItemCount</h3>*@
                 @*https://stackoverflow.com/questions/47453508/html-pagedlistpager-cant-be-found*@
                 @Html.PagedListPager((IPagedList)Model, page => Url.Action("History", new { page }), X.PagedList.Mvc.Common.PagedListRenderOptionsBase.ClassicPlusFirstAndLast)
             </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="ViewCheckResultsModal" tabindex="-1" role="dialog" aria-labelledby="ViewCheckResultsModalLabel" data-backdrop="static">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form name="ViewCheckResultsForm" role="form" novalidate class="form-validation">
+                <div class="modal-header">
+                    <h4 class="modal-title">
+                        <span>@L("CheckResults")</span>
+                    </h4>
+                </div>
+                <div class="modal-body">
+                    <div class="form-group form-float">
+                        <div class="form-line">
+                            <p id="contentCheckResults"></p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default waves-effect" data-dismiss="modal">@L("Cancel")</button>
+                </div>
+            </form>
         </div>
     </div>
 </div>

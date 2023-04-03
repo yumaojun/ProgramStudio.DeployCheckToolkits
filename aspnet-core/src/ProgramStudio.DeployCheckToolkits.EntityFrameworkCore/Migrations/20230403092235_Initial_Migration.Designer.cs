@@ -9,7 +9,7 @@ using ProgramStudio.DeployCheckToolkits.EntityFrameworkCore;
 namespace ProgramStudio.DeployCheckToolkits.Migrations
 {
     [DbContext(typeof(DeployCheckToolkitsDbContext))]
-    [Migration("20230314073154_Initial_Migration")]
+    [Migration("20230403092235_Initial_Migration")]
     partial class Initial_Migration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -1010,6 +1010,82 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.ToTable("AbpUsers");
                 });
 
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.BaseData.ProjectInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<bool>("IsActive");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProjectInfos");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanHead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("FileName");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("Result");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CutoverPlanHeads");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<int>("CutoverPlanHeadId");
+
+                    b.Property<string>("DeployItemName");
+
+                    b.Property<string>("DeployVersion");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("RollbackVersion");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("CutoverPlanHeadId");
+
+                    b.ToTable("CutoverPlanInfos");
+                });
+
             modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.DeployCheck.GrepConfiguration", b =>
                 {
                     b.Property<int>("Id")
@@ -1034,6 +1110,34 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("GrepConfigurations");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.DeployCheck.GrepHistory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("DeployName");
+
+                    b.Property<string>("FileExtension");
+
+                    b.Property<string>("FileName");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("Result");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("GrepHistories");
                 });
 
             modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.MultiTenancy.Tenant", b =>
@@ -1233,6 +1337,14 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.HasOne("ProgramStudio.DeployCheckToolkits.Authorization.Users.User", "LastModifierUser")
                         .WithMany()
                         .HasForeignKey("LastModifierUserId");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanInfo", b =>
+                {
+                    b.HasOne("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanHead", "CutoverPlanHead")
+                        .WithMany("CutoverPlanInfos")
+                        .HasForeignKey("CutoverPlanHeadId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.MultiTenancy.Tenant", b =>

@@ -208,6 +208,10 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
                 matchCount = results.Where(r => r.IsSuccess).SelectMany(r => r.Matches).Count();
             }
 
+            if (fileName.EndsWith(".apk.zip", StringComparison.OrdinalIgnoreCase) || fileName.EndsWith(".ipa.zip", StringComparison.OrdinalIgnoreCase))
+            {
+                fileName = fileName.Remove(fileName.Length - ".zip".Length);
+            }
             var ext = Path.GetExtension(fileName).TrimStart('.');
             var msgResult = L("SearchResultTips").TrimStart('：').TrimStart(':').Replace("${duration}", durationStr).Replace("${matchCount}", matchCount.ToString())
                 .Replace("${successCount}", successCount.ToString()).Replace("${processedFiles}", _processedFiles.ToString());

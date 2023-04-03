@@ -52,12 +52,12 @@
         var oldFile = null;
         var uploader = null;
         function addFileQueueText(file, message) {
+            oldFile = file;
             let $list = $("#thelist");
             $list.append('<div id="' + file.id + '" class="item">' +
                 '<h4 class="info">' + file.name + '</h4>' +
                 '<p class="state">' + message + '...</p>' +
                 '</div>');
-            oldFile = file;
         }
         function createUploader(callback) {
             uploader = WebUploader.create({
@@ -102,12 +102,12 @@
                 }
             });
             uploader.on('fileQueued', function (file) {
+                oldFile = file;
                 let $list = $("#thelist");
                 $list.append('<div id="' + file.id + '" class="item">' +
                     '<h4 class="info">' + file.name + '</h4>' +
                     '<p class="state">' + msgWaitingForUpload + '...</p>' +
                     '</div>');
-                oldFile = file;
                 //uploader.md5File(file)
                 //    .progress(function (percentage) {
                 //        console.log('Percentage:', percentage);
@@ -282,7 +282,7 @@
                                 let result = response.data.result;
                                 this.duration = result.duration;
                                 if (result.dataResult != null && result.dataResult.length > 0) {
-                                    this.dataResult = result.dataResult;
+                                    this.dataResult = this.processSearchResults(result.dataResult);
                                     this.matchCount = result.matchCount;
                                     this.successCount = result.successCount;
                                     this.processedFiles = result.processedFiles;
@@ -308,6 +308,23 @@
                         }).finally(function () {
                             abp.ui.clearBusy('#app');
                         });
+                },
+                processSearchResults(data) {
+                    debugger
+                    var _dataResult = data;
+                    for (let i = 0; i < _dataResult.length; i++) {
+                        var _searchResults = _dataResult[i].searchResults;
+                        for (let j = 0; j < _searchResults.length; j++) {
+                            var obj = _searchResults[j];
+                            if (!obj.isContext) {
+                                for (let k = 0; k < obj.matches.length; k++) {
+                                    var match = obj.matches[k];
+                                    match.text = obj.lineText.substr(match.startLocation, match.length);
+                                }
+                            }
+                        }
+                    }
+                    return _dataResult;
                 },
                 checkDataOk() {
                     if (this.projectName == msgProjectName) {
@@ -356,6 +373,28 @@
                     }
                 }
             }
+        });
+        app.$watch("dataResult", function () {
+            let $trs = $("#resultRows").children("tr");
+            $trs.each(function () {
+                let $lines = $(this).find("p.searchTexts");
+                for (let i = 0; i < $lines.length; i++) {
+                    let $line = $($lines[i]);
+                    let $text = $line.children("span.text");
+                    let $keywords = $line.children("input[type=hidden]");
+                    let totalText = $text.html();
+                    let kwsHas = [];
+                    for (let i = 0; i < $keywords.length; i++) {
+                        let keyword = $keywords[i].value;
+                        if ($.inArray(keyword, kwsHas) != -1)
+                            continue;
+                        let regEx = new RegExp(keyword, 'g');
+                        totalText = totalText.replace(regEx, `<span style='background-color:yellow;'>${keyword}</span>`);
+                        kwsHas.push(keyword);
+                    }
+                    $text.html(totalText);
+                }
+            })
         });
     </script>
 }
@@ -441,12 +480,9 @@
                                 {{dataTemp.innerFileName}}(<span style="color: red;">{{dataTemp.matches.length}}</span>@L("Matches"))
                                 <div class="searchResults" style="display: none; line-height: 16px;">
                                     <p class="searchTexts" style="margin: 0;" v-for="innerTemp in dataTemp.searchResults">
-                                        @*<div class="searchMatches" v-for="matcheTemp in innerTemp.matches">
-                                                {{matcheTemp.startLocation}}
-                                                {{matcheTemp.endPosition}}
-                                            </div>*@
+                                        <input type="hidden" v-for="matcheTemp in innerTemp.matches" v-model="matcheTemp.text">
                                         <span style="background-color: lightgray; padding: 0 3px 0 3px;">{{innerTemp.lineNumber}}</span>
-                                        {{innerTemp.lineText}}
+                                        <span class="text">{{innerTemp.lineText}}</span>
                                     </p>
                                 </div>
                             </td>

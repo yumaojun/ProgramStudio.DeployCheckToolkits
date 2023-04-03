@@ -391,6 +391,25 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "CutoverPlanHeads",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    ProjectName = table.Column<string>(nullable: true),
+                    FileName = table.Column<string>(nullable: true),
+                    Result = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CutoverPlanHeads", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "GrepConfigurations",
                 columns: table => new
                 {
@@ -408,6 +427,45 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_GrepConfigurations", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "GrepHistories",
+                columns: table => new
+                {
+                    Id = table.Column<long>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    ProjectName = table.Column<string>(nullable: true),
+                    DeployName = table.Column<string>(nullable: true),
+                    FileName = table.Column<string>(nullable: true),
+                    FileExtension = table.Column<string>(nullable: true),
+                    Result = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_GrepHistories", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "ProjectInfos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    ProjectName = table.Column<string>(nullable: true),
+                    IsActive = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_ProjectInfos", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -667,6 +725,33 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                         name: "FK_AbpUserTokens_AbpUsers_UserId",
                         column: x => x.UserId,
                         principalTable: "AbpUsers",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "CutoverPlanInfos",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    CreationTime = table.Column<DateTime>(nullable: false),
+                    CreatorUserId = table.Column<long>(nullable: true),
+                    LastModificationTime = table.Column<DateTime>(nullable: true),
+                    LastModifierUserId = table.Column<long>(nullable: true),
+                    CutoverPlanHeadId = table.Column<int>(nullable: false),
+                    ProjectName = table.Column<string>(nullable: true),
+                    DeployItemName = table.Column<string>(nullable: true),
+                    DeployVersion = table.Column<string>(nullable: true),
+                    RollbackVersion = table.Column<string>(nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CutoverPlanInfos", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_CutoverPlanInfos_CutoverPlanHeads_CutoverPlanHeadId",
+                        column: x => x.CutoverPlanHeadId,
+                        principalTable: "CutoverPlanHeads",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                 });
@@ -1061,6 +1146,11 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                 name: "IX_AbpUserTokens_TenantId_UserId",
                 table: "AbpUserTokens",
                 columns: new[] { "TenantId", "UserId" });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_CutoverPlanInfos_CutoverPlanHeadId",
+                table: "CutoverPlanInfos",
+                column: "CutoverPlanHeadId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)
@@ -1135,7 +1225,16 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                 name: "AbpUserTokens");
 
             migrationBuilder.DropTable(
+                name: "CutoverPlanInfos");
+
+            migrationBuilder.DropTable(
                 name: "GrepConfigurations");
+
+            migrationBuilder.DropTable(
+                name: "GrepHistories");
+
+            migrationBuilder.DropTable(
+                name: "ProjectInfos");
 
             migrationBuilder.DropTable(
                 name: "AbpEntityChanges");
@@ -1145,6 +1244,9 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
 
             migrationBuilder.DropTable(
                 name: "AbpEditions");
+
+            migrationBuilder.DropTable(
+                name: "CutoverPlanHeads");
 
             migrationBuilder.DropTable(
                 name: "AbpEntityChangeSets");

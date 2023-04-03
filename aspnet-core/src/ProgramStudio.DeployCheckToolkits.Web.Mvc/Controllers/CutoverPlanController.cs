@@ -14,6 +14,7 @@ using NPOI.HSSF.UserModel;
 using ProgramStudio.DeployCheckToolkits.CutoverPlan.Dto;
 using ProgramStudio.DeployCheckToolkits.CutoverPlan;
 using X.PagedList;
+using System.Text;
 
 namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 {
@@ -22,11 +23,13 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
     {
         private const string FilePath = "CutoverPlan";
         private readonly IProjectInfoAppService _projectInfoAppService;
+        private readonly ICutoverPlanHeadAppService _cutoverPlanHeadAppService;
         private readonly ICutoverPlanInfoAppService _cutoverPlanInfoAppService;
 
-        public CutoverPlanController(IProjectInfoAppService projectInfoAppService, ICutoverPlanInfoAppService cutoverPlanInfoAppService)
+        public CutoverPlanController(IProjectInfoAppService projectInfoAppService, ICutoverPlanHeadAppService cutoverPlanHeadAppService, ICutoverPlanInfoAppService cutoverPlanInfoAppService)
         {
             _projectInfoAppService = projectInfoAppService;
+            _cutoverPlanHeadAppService = cutoverPlanHeadAppService;
             _cutoverPlanInfoAppService = cutoverPlanInfoAppService;
         }
 
@@ -77,6 +80,7 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
         [HttpPost]
         public async Task<IActionResult> Check(string projectName, string fileName)
         {
+            List<string> resultMessages = new List<string>();
             List<CutoverPlanInfoDto> cutoverPlanList = new List<CutoverPlanInfoDto>();
             List<CutoverPlanInfoDto> rollbackList = new List<CutoverPlanInfoDto>();
             string filePath = Path.Combine(AppContext.BaseDirectory, FilePath, AbpSession.UserId.ToString(), fileName);
@@ -134,17 +138,17 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 
                     if (taskTypeColPos < 0)
                     {
-                        return BadRequest("部署信息表缺少'任务类别'列");
+                        return BadRequest(L("DeployMissingTaskCategory"));
                     }
 
                     if (taskItemColPos < 0)
                     {
-                        return BadRequest("部署信息表缺少'任务项'列");
+                        return BadRequest(L("DeployMissingTaskItem"));
                     }
 
                     if (taskDescColPos < 0)
                     {
-                        return BadRequest("部署信息表缺少'任务描述'列");
+                        return BadRequest(L("DeployMissingTaskDesc"));
                     }
 
                     for (int i = dataRowStart; i <= dataRowCount; i++)
@@ -171,7 +175,7 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 
                 if (cutoverPlanList.Count == 0)
                 {
-                    return BadRequest("部署信息表未查询到相应记录");
+                    return BadRequest(L("DeployNoRecords"));
                 }
 
                 // 第2个sheet
@@ -211,17 +215,17 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 
                     if (taskTypeColPos < 0)
                     {
-                        return BadRequest("回滚信息表缺少'任务类别'列");
+                        return BadRequest(L("RollbackMissingTaskCategory"));
                     }
 
                     if (taskItemColPos < 0)
                     {
-                        return BadRequest("回滚信息表缺少'任务项'列");
+                        return BadRequest(L("RollbackMissingTaskItem"));
                     }
 
                     if (taskDescColPos < 0)
                     {
-                        return BadRequest("回滚信息表缺少'任务描述'列");
+                        return BadRequest(L("RollbackMissingTaskDesc"));
                     }
 
                     for (int i = dataRowStart; i <= dataRowCount; i++)
@@ -248,7 +252,7 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 
             foreach (var item in cutoverPlanList)
             {
-                var lastCutoverPlanItem = cutoverPlanHistories.FindLast(x => x.DeployItemName == item.DeployItemName && x.DeployVersion != item.DeployVersion);
+                var lastCutoverPlanItem = cutoverPlanHistories.FindLast(x => x.DeployItemName == item.DeployItemName /*&& x.DeployVersion != item.DeployVersion*/);
                 if (lastCutoverPlanItem != null)
                 {
                     item.LastVersion = lastCutoverPlanItem.DeployVersion;
@@ -261,8 +265,23 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
                     item.RollbackVersion = oneRollbackItem.RollbackVersion;
                 }
 
+                GetResultErrorMessage(item, cutoverPlanHistories, ref resultMessages);
+            }
+
+            // Save to DB
+            var newCutoverPlanHeadDto = new CreateCutoverPlanHeadDto()
+            {
+                ProjectName = projectName,
+                FileName = fileName,
+                Result = string.Join(";", resultMessages)
+            };
+            var eitntyCutoverPlanHead = await _cutoverPlanHeadAppService.Create(newCutoverPlanHeadDto);
+
+            foreach (var item in cutoverPlanList)
+            {
                 await _cutoverPlanInfoAppService.Create(new CreateCutoverPlanInfoDto()
                 {
+                    CutoverPlanHead = new CutoverPlanHead() { Id = eitntyCutoverPlanHead.Id },
                     ProjectName = item.ProjectName,
                     DeployItemName = item.DeployItemName,
                     DeployVersion = item.DeployVersion,
@@ -270,46 +289,62 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
                 });
             }
 
-            List<string> messages = new List<string>();
+            return Ok(new { dataResult = cutoverPlanList, messages = resultMessages });
+        }
 
-            foreach (var item in cutoverPlanList)
+        private void GetResultErrorMessage(CutoverPlanInfoDto item, List<CutoverPlanInfoDto> cutoverPlanHistories, ref List<string> messages)
+        {
+            bool hasDeployMsg = false;
+            bool hasRollbackMsg = false;
+
+            StringBuilder strStart = new StringBuilder($"部署内容‘{item.DeployItemName}’的");
+
+            if (string.IsNullOrEmpty(item.DeployVersion))
             {
-                bool hasMsg = false;
-                bool hasDone = false;
-
-                string strStart = $"部署内容{item.DeployItemName}的";
-
-                if (string.IsNullOrEmpty(item.DeployVersion))
+                strStart.Append("部署版本号为空");
+                hasDeployMsg = true;
+            }
+            else
+            {
+                if (item.DeployVersion.Equals(item.RollbackVersion))
                 {
-                    strStart += "部署版本号为空";
-                    hasMsg = true;
+                    strStart.Append("部署版本号与回滚版本号相同");
+                    hasDeployMsg = true;
                 }
-                else if (item.DeployVersion.Equals(item.RollbackVersion))
+                // 与任一历史版本号相同
+                var lastCutoverPlanItem = cutoverPlanHistories.FindLast(x => x.DeployItemName == item.DeployItemName && x.DeployVersion == item.DeployVersion);
+                if (lastCutoverPlanItem != null)
                 {
-                    strStart += "部署版本号与回滚版本号相同";
-                    hasMsg = true;
-                }
-                //与任一历史版本号相同
-
-                if (string.IsNullOrEmpty(item.RollbackVersion))
-                {
-                    strStart += (hasMsg ? "，" : "") + "回滚版本号为空";
-                    hasDone = true;
-                }
-                else if (!item.RollbackVersion.Equals(item.LastVersion))
-                {
-                    strStart += (hasMsg ? "，" : "") + "回滚版本号与最近历史版本号不相同";
-                    hasDone = true;
-                }
-                //与任一历史版本号都不相同
-
-                if (hasMsg || hasDone)
-                {
-                    messages.Add(strStart);
+                    strStart.Append(hasDeployMsg ? "、" : string.Empty).Append("部署版本号与任一历史版本号相同");
+                    hasDeployMsg = true;
                 }
             }
 
-            return Ok(new { dataResult = cutoverPlanList, messages = messages });
+            if (string.IsNullOrEmpty(item.RollbackVersion))
+            {
+                strStart.Append(hasDeployMsg ? "，" : string.Empty).Append("回滚版本号为空");
+                hasRollbackMsg = true;
+            }
+            else
+            {
+                // 与任一历史版本号都不相同
+                var lastRollbackItem = cutoverPlanHistories.FindLast(x => x.DeployItemName == item.DeployItemName && x.DeployVersion == item.RollbackVersion);
+                if (lastRollbackItem == null)
+                {
+                    strStart.Append(hasDeployMsg ? "，" : string.Empty).Append("回滚版本号与任一历史版本号都不相同");
+                    hasRollbackMsg = true;
+                }
+                else if (!item.RollbackVersion.Equals(item.LastVersion))
+                {
+                    strStart.Append(hasDeployMsg ? "，" : string.Empty).Append("回滚版本号与最近历史版本号不相同");
+                    hasRollbackMsg = true;
+                }
+            }
+
+            if (hasDeployMsg || hasRollbackMsg)
+            {
+                messages.Add(strStart.ToString());
+            }
         }
 
         public ActionResult History(int? page)
@@ -323,12 +358,11 @@ namespace ProgramStudio.DeployCheckToolkits.Web.Controllers
 
             var pageDto = new PagedCutoverPlanInfoResultRequestDto()
             {
-                UserId = AbpSession.UserId.Value,
                 SkipCount = (pageNumber - 1) * pageSize,
                 MaxResultCount = pageSize
             };
 
-            var pagedList = _cutoverPlanInfoAppService.GetPagedCutoverPlanHistories(pageDto);
+            var pagedList = _cutoverPlanInfoAppService.GetPagedCutoverPlanInfoHistories(pageDto);
             var result = new StaticPagedList<CutoverPlanInfoDto>(pagedList.Items, pageNumber, pageSize, pagedList.TotalCount);
 
             return View("History", result);

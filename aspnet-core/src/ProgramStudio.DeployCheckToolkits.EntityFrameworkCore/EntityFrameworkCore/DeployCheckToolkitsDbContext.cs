@@ -16,6 +16,7 @@ namespace ProgramStudio.DeployCheckToolkits.EntityFrameworkCore
         public DbSet<GrepHistory> GrepHistories { get; set; }
 
         public DbSet<ProjectInfo> ProjectInfos { get; set; }
+        public DbSet<CutoverPlanHead> CutoverPlanHeads { get; set; }
         public DbSet<CutoverPlanInfo> CutoverPlanInfos { get; set; }
 
         public DeployCheckToolkitsDbContext(DbContextOptions<DeployCheckToolkitsDbContext> options)

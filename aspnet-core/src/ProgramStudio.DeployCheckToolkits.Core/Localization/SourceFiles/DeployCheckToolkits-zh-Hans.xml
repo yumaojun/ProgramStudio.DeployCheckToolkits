@@ -98,6 +98,7 @@
     <text name="DeleteTenantConfirm">确认删除该租户？</text>
     <text name="EditTenant">编辑租户</text>
 
+	<text name="Refresh">刷新</text>
 	<text name="Settings">配置</text>
 	<text name="CreateNewSetting">创建新配置</text>
 	<text name="EditSetting">编辑配置</text>
@@ -125,9 +126,21 @@
 	<text name="FileExtension">文件类型</text>
 
 	<text name="CutoverPlan">Cutover Plan检查</text>
-	<text name="Refresh">刷新</text>
 	<text name="Project">项目</text>
 	<text name="ProjectInfo">项目信息</text>
+	<text name="DeployItemName">部署内容</text>
+	<text name="DeployVersion">部署版本号</text>
+	<text name="RollbackVersion">回滚版本号</text>
+	<text name="LastHistoryVersion">最近历史版本号</text>
+	<text name="LastCheckTime">最近检查时间</text>
+	<text name="DeployMissingTaskCategory'">部署信息表缺少'任务类别'列</text>
+	<text name="DeployMissingTaskItem">部署信息表缺少'任务项'列</text>
+	<text name="DeployMissingTaskDesc">部署信息表缺少'任务描述'列</text>
+	<text name="DeployNoRecords">部署信息表未查询到相应记录</text>
+	<text name="RollbackMissingTaskCategory">回滚信息表缺少'任务类别'列</text>
+	<text name="RollbackMissingTaskItem">回滚信息表缺少'任务项'列</text>
+	<text name="RollbackMissingTaskDesc">回滚信息表缺少'任务描述'列</text>
+	<text name="View">查看</text>
   </texts>
 </localizationDictionary>
 

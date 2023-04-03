@@ -2,7 +2,7 @@
 
 namespace ProgramStudio.DeployCheckToolkits.CutoverPlan.Dto
 {
-    public class PagedCutoverPlanHeadResultRequestDto : PagedResultRequestDto
+    public class PagedCutoverPlanInfoResultRequestDto : PagedResultRequestDto
     {
         //public long UserId { get; set; }
         //public string Keyword { get; set; }

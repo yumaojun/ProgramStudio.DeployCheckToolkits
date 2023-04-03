@@ -14,12 +14,13 @@ namespace ProgramStudio.DeployCheckToolkits.CutoverPlan.Dto
         public string ProjectName { get; set; }
 
         [Required]
+        public CutoverPlanHead CutoverPlanHead { get; set; }
+
+        [Required]
         public string DeployItemName { get; set; }
 
         public string DeployVersion { get; set; }
 
         public string RollbackVersion { get; set; }
-
-        public bool IsActive {get; set;}
     }
 }

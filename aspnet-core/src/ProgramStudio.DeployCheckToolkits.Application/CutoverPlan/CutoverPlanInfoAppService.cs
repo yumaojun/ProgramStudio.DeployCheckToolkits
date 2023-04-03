@@ -50,10 +50,10 @@ namespace ProgramStudio.DeployCheckToolkits.CutoverPlan
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        public PagedResultDto<CutoverPlanInfoDto> GetPagedCutoverPlanHistories(PagedCutoverPlanInfoResultRequestDto requestDto)
+        public PagedResultDto<CutoverPlanInfoDto> GetPagedCutoverPlanInfoHistories(PagedCutoverPlanInfoResultRequestDto requestDto)
         {
-            var count = Repository.Count(x => x.CreatorUserId == requestDto.UserId);
-            var result = Repository.GetAll().Where(x => x.CreatorUserId == requestDto.UserId).OrderByDescending(x => x.Id).PageBy(requestDto).ToList();
+            var count = Repository.Count();
+            var result = Repository.GetAllIncluding(x => x.CutoverPlanHead).OrderByDescending(x => x.Id).PageBy(requestDto).ToList();
 
             return new PagedResultDto<CutoverPlanInfoDto>
             {

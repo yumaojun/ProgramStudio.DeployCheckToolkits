@@ -23,6 +23,6 @@ namespace ProgramStudio.DeployCheckToolkits.CutoverPlan
         /// </summary>
         /// <param name="dto"></param>
         /// <returns></returns>
-        PagedResultDto<CutoverPlanInfoDto> GetPagedCutoverPlanHistories(PagedCutoverPlanInfoResultRequestDto requestDto);
+        PagedResultDto<CutoverPlanInfoDto> GetPagedCutoverPlanInfoHistories(PagedCutoverPlanInfoResultRequestDto requestDto);
     }
 }

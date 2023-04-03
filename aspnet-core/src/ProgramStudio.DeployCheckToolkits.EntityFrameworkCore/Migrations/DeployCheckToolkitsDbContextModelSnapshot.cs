@@ -1008,7 +1008,7 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.ToTable("AbpUsers");
                 });
 
-            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlanInfo", b =>
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.BaseData.ProjectInfo", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd();
@@ -1017,11 +1017,57 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
 
                     b.Property<long?>("CreatorUserId");
 
+                    b.Property<bool>("IsActive");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("ProjectInfos");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanHead", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<string>("FileName");
+
+                    b.Property<DateTime?>("LastModificationTime");
+
+                    b.Property<long?>("LastModifierUserId");
+
+                    b.Property<string>("ProjectName");
+
+                    b.Property<string>("Result");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CutoverPlanHeads");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanInfo", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd();
+
+                    b.Property<DateTime>("CreationTime");
+
+                    b.Property<long?>("CreatorUserId");
+
+                    b.Property<int>("CutoverPlanHeadId");
+
                     b.Property<string>("DeployItemName");
 
                     b.Property<string>("DeployVersion");
-
-                    b.Property<bool>("IsActive");
 
                     b.Property<DateTime?>("LastModificationTime");
 
@@ -1032,6 +1078,8 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.Property<string>("RollbackVersion");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("CutoverPlanHeadId");
 
                     b.ToTable("CutoverPlanInfos");
                 });
@@ -1137,28 +1185,6 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.HasIndex("TenancyName");
 
                     b.ToTable("AbpTenants");
-                });
-
-            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.ProjectInfo", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd();
-
-                    b.Property<DateTime>("CreationTime");
-
-                    b.Property<long?>("CreatorUserId");
-
-                    b.Property<bool>("IsActive");
-
-                    b.Property<DateTime?>("LastModificationTime");
-
-                    b.Property<long?>("LastModifierUserId");
-
-                    b.Property<string>("ProjectName");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ProjectInfos");
                 });
 
             modelBuilder.Entity("Abp.Application.Features.EditionFeatureSetting", b =>
@@ -1309,6 +1335,14 @@ namespace ProgramStudio.DeployCheckToolkits.Migrations
                     b.HasOne("ProgramStudio.DeployCheckToolkits.Authorization.Users.User", "LastModifierUser")
                         .WithMany()
                         .HasForeignKey("LastModifierUserId");
+                });
+
+            modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanInfo", b =>
+                {
+                    b.HasOne("ProgramStudio.DeployCheckToolkits.CutoverPlan.CutoverPlanHead", "CutoverPlanHead")
+                        .WithMany("CutoverPlanInfos")
+                        .HasForeignKey("CutoverPlanHeadId")
+                        .OnDelete(DeleteBehavior.Cascade);
                 });
 
             modelBuilder.Entity("ProgramStudio.DeployCheckToolkits.MultiTenancy.Tenant", b =>

@@ -124,5 +124,18 @@
 	<text name="CutoverPlan">Cutover Plan Check</text>
 	<text name="Project">Project</text>
 	<text name="ProjectInfo">Project Info</text>
+	<text name="DeployItemName">Deployment Content</text>
+	<text name="DeployVersion">Deployment Version</text>
+	<text name="RollbackVersion">Rollback Version</text>
+	<text name="LastHistoryVersion">Last History Version</text>
+	<text name="LastCheckTime">Last Check Time</text>
+	<text name="DeployMissingTaskCategory'">The Deploy 'Task Category' column is missing</text>
+	<text name="DeployMissingTaskItem">The Deploy 'Task Item' column is missing</text>
+	<text name="DeployMissingTaskDesc">The Deploy 'Task Description' column is missing</text>
+	<text name="DeployNoRecords">Deployment Information No Records</text>
+	<text name="RollbackMissingTaskCategory">The Rollback 'Task Category' column is missing</text>
+	<text name="RollbackMissingTaskItem">The Rollback 'Task Item' column is missing</text>
+	<text name="RollbackMissingTaskDesc">The Rollback 'Task Description' column is missing</text>
+	<text name="View">View</text>
   </texts>
 </localizationDictionary>

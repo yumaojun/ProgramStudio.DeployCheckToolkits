@@ -14,10 +14,8 @@
         var allowedFileExtensions = 'xls,xlsx';
         var msgTips = '';
         var msgProjectName = '';
-        //var msgDeployName = '';
         var msgSelectOneFile = '';
         var msgUploadFile = '';
-        var msgCheckConfiguration = '';
         var msgWaitingForUpload = '';
         var msgUploading = '';
         var msgUploadCompleted = '';
@@ -27,10 +25,8 @@
         function initMsg() {
             msgTips = $("#hdTips").val();
             msgProjectName = $("#hdSelectProjectName").val();
-            //msgDeployName = $("#hdSelectDeployName").val();
             msgSelectOneFile = $("#hdSelectOneFile").val();
             msgUploadFile = $("#hdUploadFile").val();
-            msgCheckConfiguration = $("#hdCheckConfiguration").val();
             msgWaitingForUpload = $("#hdWaitingForUpload").val();
             msgUploading = $("#hdUploading").val();
             msgUploadCompleted = $("#hdUploadCompleted").val();
@@ -45,12 +41,12 @@
         var oldFile = null;
         var uploader = null;
         function addFileQueueText(file, message) {
+            oldFile = file;
             let $list = $("#thelist");
             $list.append('<div id="' + file.id + '" class="item">' +
                 '<h4 class="info">' + file.name + '</h4>' +
                 '<p class="state">' + message + '...</p>' +
                 '</div>');
-            oldFile = file;
         }
         function readExcelFile(file) {
             debugger
@@ -58,7 +54,6 @@
             let workbook;
             let fileReader = new FileReader();
             fileReader.onload = function (ev) {
-                //debugger
                 try {
                     let data = ev.target.result
                     workbook = XLSX.read(data, { type: 'binary' });
@@ -106,7 +101,7 @@
                 duplicate: true,
                 resize: false,
                 auto: true, /*sendAsBinary: true,*/
-                fileSingleSizeLimit: 100 * 1024 * 1024/*MB*/
+                fileSingleSizeLimit: 50 * 1024 * 1024/*MB*/
             });
             uploader.on('beforeFileQueued', function (file) {
                 if ($.inArray(file.ext.toLowerCase(), allowedFileExtensions.split(",")) == -1) {
@@ -121,12 +116,12 @@
                 }
             });
             uploader.on('fileQueued', function (file) {
+                oldFile = file;
                 let $list = $("#thelist");
                 $list.append('<div id="' + file.id + '" class="item">' +
                     '<h4 class="info">' + file.name + '</h4>' +
                     '<p class="state">' + msgWaitingForUpload + '...</p>' +
                     '</div>');
-                oldFile = file;
             });
             uploader.on('uploadProgress', function (file, percentage) {
                 let $li = $('#' + file.id),
@@ -146,39 +141,17 @@
                 $li.find('p.state').text(msgUploadCompleted);
             });
             uploader.on('uploadSuccess', function (file, response) {
-                //debugger
-                //serverFileMd5Cache.push(serverFileMd5);
                 serverFileName = response.result;
-                //console.log("uploadSuccess", response);
                 callback();
-                //debugger
-                //readExcelFile(file.getSource().getSource());
             });
             uploader.on('uploadAccept', function (object, response) {
-                //console.log("uploadAccept", object, response);
-                //debugger
             });
             uploader.on('uploadError', function (file, reason) {
-                //abp.message.warn("上传出错！请检查后重新上传！", msgTips);
-                //console.log("uploadError", reason);
-                //debugger
             });
             uploader.on("error", function (type) {
-                //if (type == "F_EXCEED_SIZE") {
-                //    abp.message.warn("文件大小不能超过100MB", msgTips);
-                //} else {
-                //abp.message.warn("上传出错！请检查后重新上传！错误代码" + type, msgTips);
-                //}
-                //console.log("error", type);
             });
             uploader.on('uploadFinished', function () {
-                ///*没有文件上传也会运行到此*/
-                //if (oldFile != null && serverFileName != "") {
-                //    callback();
-                //} else {
-                //    abp.message.warn(msgSelectOneFile, msgTips);
-                //}
-                //console.log("uploadFinished");
+                /*没有文件上传也会运行到此*/
             });
         }
         Vue.filter('dateFormat', function (value, format) {
@@ -191,18 +164,10 @@
                 dataHeader: {},
                 dataRows: [],
                 projectName: msgProjectName,
-                //deployName: msgDeployName,
                 projectNames: [],
-                //deployNamesCache: [],
-                //deployNames: [],
                 dataResult: [],
                 searchResult: [],
-                //xmlContent: "",
                 fileName: "",
-                //duration: "",
-                //matchCount: 0,
-                //successCount: 0,
-                //processedFiles: 0,
                 searchResultTipsCache: "",
                 searchResultTips: ""
             },
@@ -253,8 +218,6 @@
                 submitData() {
                     let formData = new FormData();
                     formData.append("projectName", this.projectName);
-                    //formData.append("deployName", this.deployName);
-                    //formData.append("xmlContent", this.xmlContent);
                     formData.append("fileName", serverFileName);
                     let contentHeader = {
                         headers: { 'content-type': 'application/x-www-form-urlencoded' }
@@ -267,20 +230,6 @@
                                 let result = response.data.result.dataResult;
                                 this.dataResult = result;
                                 this.searchResult = response.data.result.messages;
-                                //this.duration = result.duration;
-                                //if (result.dataResult != null && result.dataResult.length > 0) {
-                                //    this.dataResult = result.dataResult;
-                                //    this.matchCount = result.matchCount;
-                                //    this.successCount = result.successCount;
-                                //    this.processedFiles = result.processedFiles;
-                                //} else {
-                                //    this.dataResult = [{ innerFileName: msgNone, matches: [], searchResults: [] }];
-                                //    this.matchCount = 0;
-                                //    this.successCount = 0;
-                                //    this.processedFiles = 0;
-                                //}
-                                //this.searchResultTips = this.searchResultTipsCache.replace("${duration}", this.duration).replace("${matchCount}", this.matchCount)
-                                //    .replace("${successCount}", this.successCount).replace("${processedFiles}", this.processedFiles);
                             } catch (e) {
                                 console.log(e, response);
                             }
@@ -301,46 +250,10 @@
                         abp.message.warn(msgProjectName, msgTips);
                         return false;
                     }
-                    //if (this.deployName == msgDeployName) {
-                    //    abp.message.warn(msgDeployName, msgTips);
-                    //    return false;
-                    //}
-                    //if (this.xmlContent == "") {
-                    //    abp.message.warn(msgCheckConfiguration, msgTips);
-                    //    return false;
-                    //}
                     return true;
                 },
                 selectProject(e) {
                     this.projectName = e.target.innerText;
-                    let thisProjectName = this.projectName;
-                    //let thisDeployNames = this.deployNamesCache.filter(function (item) {
-                    //    return item["projectName"] == thisProjectName;
-                    //});
-                    //this.deployNames = [{ deployName: msgDeployName }].concat(thisDeployNames);
-                    //this.deployName = msgDeployName;
-                },
-                selectDeploy(e) {
-                    //this.deployName = e.target.innerText;
-                    //let thisProjectName = this.projectName;
-                    //let thisDeployName = this.deployName;
-                    //let thisDeployNames = this.deployNamesCache.filter(function (item) {
-                    //    return item["projectName"] == thisProjectName && item["deployName"] == thisDeployName;
-                    //});
-                    //if (thisDeployNames.length > 0) {
-                    //    this.xmlContent = thisDeployNames[0]["xmlContent"];
-                    //}
-                },
-                toggleSearchResults(e) {
-                    //let $spanButton = $(e.target);
-                    //let $divSearchResult = $spanButton.siblings("div.searchResults");
-                    //if ($spanButton.hasClass("glyphicon-triangle-right")) {
-                    //    $spanButton.removeClass("glyphicon-triangle-right").addClass("glyphicon-triangle-bottom");
-                    //    $divSearchResult.css("display", "block");
-                    //} else {
-                    //    $spanButton.removeClass("glyphicon-triangle-bottom").addClass("glyphicon-triangle-right");
-                    //    $divSearchResult.css("display", "none");
-                    //}
                 }
             }
         });
@@ -354,9 +267,7 @@
                     @L("CutoverPlan")
                     <input id="hdTips" type="hidden" value="@L("Tips")" />
                     <input id="hdSelectProjectName" type="hidden" value="@L("SelectProjectName")" />
-                    <input id="hdSelectDeployName" type="hidden" value="@L("SelectDeployName")" />
                     <input id="hdSelectOneFile" type="hidden" value="@L("SelectOneFile")" />
-                    <input id="hdCheckConfiguration" type="hidden" value="@L("CheckConfiguration")" />
                     <input id="hdWaitingForUpload" type="hidden" value="@L("WaitingForUpload")" />
                     <input id="hdUploading" type="hidden" value="@L("Uploading")" />
                     <input id="hdUploadCompleted" type="hidden" value="@L("UploadCompleted")" />
@@ -410,28 +321,15 @@
                 <table class="table">
                     <thead>
                         <tr>
-                            @*<th></th>
-                            <th>{{dataHeader.A}}</th>
-                            <th>{{dataHeader.B}}</th>
-                            <th>{{dataHeader.C}}</th>
-                            <th>{{dataHeader.D}}</th>
-                            <th>{{dataHeader.E}}</th>*@
-                        <th>部署内容</th>
-                        <th>部署版本号</th>
-                        <th>回滚版本号</th>
-                        <th>最近历史版本号</th>
-                        <th>最近检查时间</th>
+                            @*<th></th>*@
+                        <th>@L("DeployItemName")</th>
+                        <th>@L("DeployVersion")</th>
+                        <th>@L("RollbackVersion")</th>
+                        <th>@L("LastHistoryVersion")</th>
+                        <th>@L("LastCheckTime")</th>
                         </tr>
                     </thead>
                     <tbody>
-                        @*<tr v-for="rowItem in dataRows">
-                            <td>{{rowItem.RN}}</td>
-                            <td>{{rowItem.A}}</td>
-                            <td>{{rowItem.B}}</td>
-                            <td>{{rowItem.C}}</td>
-                            <td>{{rowItem.D}}</td>
-                            <td>{{rowItem.E}}</td>
-                        </tr>*@
                         <tr v-for="rowItem in dataResult">
                             @*<td>{{rowItem.rowNo}}</td>*@
                             <td>{{rowItem.deployItemName}}</td>
@@ -449,22 +347,6 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <!--<tr v-for="dataTemp in dataResult">
-                            <td>
-                                <span class="glyphicon glyphicon-triangle-right" @@click="toggleSearchResults"></span>
-                                {{dataTemp.innerFileName}}(<span style="color: red;">{{dataTemp.matches.length}}</span>@L("Matches"))
-                                <div class="searchResults" style="display: none;">
-                                    <p class="searchTexts" style="margin: 0;" v-for="innerTemp in dataTemp.searchResults">-->
-                                        @*<div class="searchMatches" v-for="matcheTemp in innerTemp.matches">
-                                                {{matcheTemp.startLocation}}
-                                                {{matcheTemp.endPosition}}
-                                            </div>*@
-                                        <!--<span style="background-color: lightgray;">{{innerTemp.lineNumber}}</span>
-                                        {{innerTemp.lineText}}
-                                    </p>
-                                </div>
-                            </td>
-                        </tr>-->
                         <tr v-for="dataTemp in searchResult">
                             <td>
                                 {{dataTemp}}
